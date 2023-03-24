@@ -1,5 +1,3 @@
-* Dart-ts-mode
-
 ** Introduction
 
 A major mode for editing Dart files with the power of =treesit=, provides syntax highlighting, indentation, and some emacs' specific features like sexp, navigation and imenu.
@@ -7,6 +5,7 @@ A major mode for editing Dart files with the power of =treesit=, provides syntax
 ** Installation
 
 You can install this package manually or use your own package manager. Below are intruductions to install:
+
 1. Clone this repo:
    #+begin_src bash
    $ git clone https://github.com/50ways2sayhard/dart-ts-mode /path/to/dart-ts-mode
