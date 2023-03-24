@@ -13,8 +13,8 @@ You can install this package manually or use your own package manager. Below are
 
 2. Add below codes to your init file:
    #+begin_src emacs-lisp
-(use-package dart-ts-mode
-  :load-path "/path/to/dart-ts-mode")
+   (use-package dart-ts-mode
+     :load-path "/path/to/dart-ts-mode")
    #+end_src
 
 3. Add =tree-sitter-dart= to =treesit-language-source-alist=:
