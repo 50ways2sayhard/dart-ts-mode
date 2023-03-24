@@ -1,0 +1,53 @@
+* Dart-ts-mode
+
+** Introduction
+
+A major mode for editing Dart files with the power of =treesit=, provides syntax highlighting, indentation, and some emacs' specific features like sexp, navigation and imenu.
+
+** Installation
+
+You can install this package manually or use your own package manager. Below are intruductions to install:
+1. Clone this repo:
+   #+begin_src bash
+   $ git clone https://github.com/50ways2sayhard/dart-ts-mode /path/to/dart-ts-mode
+   #+end_src
+
+2. Add below codes to your init file:
+   #+begin_src emacs-lisp
+(use-package dart-ts-mode
+  :load-path "/path/to/dart-ts-mode")
+   #+end_src
+
+3. Add =tree-sitter-dart= to =treesit-language-source-alist=:
+   #+begin_src emacs-lisp
+   (add-to-list 'treesit-language-source-alist (cons dart ("https://github.com/UserNobody14/tree-sitter-dart")))
+   #+end_src
+
+4. =M-x treesit-install-language-grammar= and select dart language.
+
+** Screenshots
+
+[[file:screenshots/dart-ts-mode.jpeg][dart-ts-mode]]
+
+** Features
+
+- Syntax highlighting
+- Indentation
+- Imenu
+- Navigation
+- Sexp
+
+** Roadmap
+
+- [ ] Font-lock for =template_substitution=.
+- [ ] Better `which-function-mode` support, includes displaing function name in function body.
+- [ ] Better sexp.
+- [ ] Better navigation.
+
+** References
+
+- [[https://github.com/bradyt/dart-mode][Dart-mode]]
+- [[https://github.com/nvim-treesitter/nvim-treesitter/tree/master/queries/dart][Nvim-treesitter query for Dart]]
+- [[https://github.com/emacs-mirror/emacs/blob/master/admin/notes/tree-sitter/starter-guide][Treesit starter guide]]
+- [[https://github.com/emacs-mirror/emacs/blob/master/lisp/progmodes/java-ts-mode.el][Emacs builtin java-ts-mode]]
+- [[https://github.com/emacs-mirror/emacs/blob/master/lisp/progmodes/typescript-ts-mode.el][Emacs builtin typescript-ts-mode]]
