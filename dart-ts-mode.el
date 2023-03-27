@@ -75,68 +75,27 @@
      (no-node parent-bol 0))))
 
 (defvar dart-ts-mode--keywords
-  '("async"
-    "async*"
-    "yield"
-    "sync*"
-    "await"
-    "get"
-    "interface"
-    "show"
-    "hide"
-    "on"
-    "class"
-    "enum"
-    "extends"
-    "in"
-    "is"
-    "new"
-    "return"
-    "super"
-    "with" "if" "else" "try" "catch")
+  '("async" "async*" "yield" "sync*"
+    "await" "get" "interface" "show"
+    "hide" "on" "class" "enum" "extends"
+    "in" "is" "new" "return"
+    "super" "with" "if" "else"
+    "try" "catch" "default" "switch")
   "Dart keywords for tree-sitter font-locking.")
 
 (defvar dart-ts-mode--builtins
-  '("abstract"
-    "as"
-    "covariant"
-    "deferred"
-    "dynamic"
-    "export"
-    "extension"
-    "external"
-    "factory"
-    "Function"
-    "get"
-    "implements"
-    "import"
-    "interface"
-    "late"
-    "library"
-    "mixin"
-    "operator"
-    "part"
-    "required"
-    "set"
-    "static"
-    "typedef")
+  '("abstract" "as" "covariant" "deferred"
+    "dynamic" "export" "extension" "external"
+    "factory" "Function" "get" "implements"
+    "import" "interface" "late" "library"
+    "mixin" "operator" "part" "required"
+    "set" "static" "typedef")
   "Dart builtins for tree-sitter font locking.")
 
 (defvar dart-ts-mode--operators
-  '("=>"
-    ".."
-    "??"
-    "=="
-    "?"
-    ":"
-    "&&"
-    "%"
-    "<"
-    ">"
-    "="
-    ">="
-    "<="
-    "||")
+  '("=>" ".." "??" "==" "?"
+    ":" "&&" "%" "<" ">" "="
+    ">=" "<=" "||")
   "Dart operators for tree-sitter font-locking.")
 
 ;; TODO font-lock for template_substitution
@@ -162,7 +121,7 @@ Argument LANGUAGE is 'dart'."
      [,@dart-ts-mode--builtins] @font-lock-builtin-face
      (break_statement) @font-lock-keyword-face
      [(this) (super) (inferred_type)] @font-lock-keyword-face
-     (case_builtin) @font-lock-builtin-face
+     (case_builtin) @font-lock-keyword-face
      ((identifier) @font-lock-type-face
       (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
      "Function" @font-lock-type-face)
@@ -252,18 +211,13 @@ Argument LANGUAGE is 'dart'."
 
    :language language
    :feature 'property
-   `((unconditional_assignable_selector (identifier) @font-lock-property-name-face)
+   `((unconditional_assignable_selector (identifier) @font-lock-property-face)
      (conditional_assignable_selector
-      (identifier) @font-lock-property-name-face))
-
-   :language language
-   :feature 'expression
-   '((assignment_expression
-      left: [(assignable_expression) @font-lock-function-name-face]))
+      (identifier) @font-lock-property-face))
 
    :language language
    :feature 'function
-   '((super) @font-lock-function-call-face)
+   `((super) @font-lock-function-call-face)
 
    :language language
    :feature 'number
@@ -273,12 +227,12 @@ Argument LANGUAGE is 'dart'."
 
    :language language
    :feature 'delimiter
-   '((["," "." ";" ":"]) @font-lock-delimiter-face)
+   `((["," "." ";" ":"]) @font-lock-delimiter-face)
 
    :language language
    :feature 'escape-sequence
    :override t
-   '((escape_sequence) @font-lock-escape-face)))
+   `((escape_sequence) @font-lock-escape-face)))
 
 
 (defvar dart-ts-mode--sentence-nodes
@@ -378,7 +332,7 @@ Return nil if there is no name or if NODE is not a defun node."
     (setq-local treesit-font-lock-feature-list
                 '((comment escape-sequence)
                   (constant keyword string type assignment definition)
-                  (annotation expression literal)
+                  (annotation expression literal property)
                   (bracket delimiter operator number)))
 
     (treesit-major-mode-setup))
