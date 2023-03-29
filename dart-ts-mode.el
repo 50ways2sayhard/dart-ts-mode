@@ -98,10 +98,9 @@
     ">=" "<=" "||")
   "Dart operators for tree-sitter font-locking.")
 
-;; TODO font-lock for template_substitution
 (defun dart-ts-mode--font-lock-settings (language)
   "Tree-sitter font-lock settings.
-Argument LANGUAGE is 'dart'."
+Argument LANGUAGE is `dart'."
   (treesit-font-lock-rules
    :language language
    :override t
@@ -137,13 +136,6 @@ Argument LANGUAGE is 'dart'."
       (equality_operator)
       (additive_operator)] @font-lock-operator-face
       (ternary_expression ["?" ":"] @font-lock-operator-face)
-      ;; ((template_substitution
-      ;;   "$" @font-lock-punctuation-face
-      ;;   "{" @font-lock-punctuation-face
-      ;;   "}" @font-lock-punctuation-face))
-      ;; (template_substitution
-      ;;  "$" @font-lock-punctuation-misc-face
-      ;;  (identifier) @font-lock-variable-face)
       ([";" "." ","]) @font-lock-delimiter-face)
 
    :language language
@@ -151,8 +143,16 @@ Argument LANGUAGE is 'dart'."
    '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
 
    :language language
+   :override t
    :feature 'string
    `((string_literal) @font-lock-string-face
+     ((template_substitution
+       "$" @font-lock-variable-name-face
+       "{" @font-lock-variable-name-face
+       "}" @font-lock-variable-name-face))
+     (template_substitution
+      "$" @font-lock-variable-name-face
+      (identifier_dollar_escaped) @font-lock-variable-name-face)
      (dotted_identifier_list) @font-lock-string-face)
 
    :language language
@@ -160,7 +160,6 @@ Argument LANGUAGE is 'dart'."
    :feature 'literal
    `([(hex_integer_literal) (decimal_integer_literal) (decimal_floating_point_literal)] @font-lock-number-face
      (symbol_literal) @font-lock-constant-face
-     (string_literal) @font-lock-string-face
      [(true) (false) (null_literal)] @font-lock-constant-face)
 
    :language language

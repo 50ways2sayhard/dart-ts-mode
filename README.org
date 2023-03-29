@@ -41,7 +41,7 @@ You can install this package manually or use your own package manager. Below are
 
 ** Roadmap
 
-- [ ] Font-lock for =template_substitution=.
+- [X] Font-lock for =template_substitution=.
 - [ ] Better =which-function-mode= support, includes displaing function name in function body.
 - [ ] Better sexp.
 - [ ] Better navigation.
