@@ -165,9 +165,7 @@ Argument LANGUAGE is `dart'."
    :language language
    :override t
    :feature 'type
-   `((class_definition
-      name: (identifier) @font-lock-type-face)
-     (constructor_signature
+   `((constructor_signature
       name: (identifier) @font-lock-type-face)
      (scoped_identifier
       scope: (identifier) @font-lock-type-face)
@@ -205,12 +203,19 @@ Argument LANGUAGE is `dart'."
       name: (identifier) @font-lock-function-name-face))
 
    :language language
-   :feature 'identifier
-   `((type_identifier) @font-lock-type-face)
+   :override t
+   :feature 'definition
+   `((class_definition
+      name: (identifier) @font-lock-type-face)
+     (initialized_identifier
+      (identifier) @font-lock-variable-name-face)
+     (initialized_variable_definition
+      (identifier) @font-lock-variable-name-face))
 
    :language language
    :feature 'property
-   `((unconditional_assignable_selector (identifier) @font-lock-property-face)
+   `((unconditional_assignable_selector
+      (identifier) @font-lock-property-face)
      (conditional_assignable_selector
       (identifier) @font-lock-property-face))
 
