@@ -80,8 +80,7 @@
     "hide" "on" "class" "enum" "extends"
     "in" "is" "new" "return"
     "super" "with" "if" "else"
-    "try" "catch" "default" "switch"
-    "throw" "rethrow")
+    "try" "catch" "default" "switch")
   "Dart keywords for tree-sitter font-locking.")
 
 (defvar dart-ts-mode--builtins
@@ -124,7 +123,10 @@ Argument LANGUAGE is `dart'."
      (case_builtin) @font-lock-keyword-face
      ((identifier) @font-lock-type-face
       (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
-     "Function" @font-lock-type-face)
+     ((identifier) @font-lock-keyword-face
+      (:match "^rethrow" @font-lock-keyword-face))
+     "Function" @font-lock-type-face
+     (throw_expression "throw" @font-lock-keyword-face) )
 
    :language language
    :override t
