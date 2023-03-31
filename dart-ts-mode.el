@@ -213,6 +213,8 @@ Argument LANGUAGE is `dart'."
      (initialized_identifier
       (identifier) @font-lock-variable-name-face)
      (initialized_variable_definition
+      (identifier) @font-lock-variable-name-face)
+     (static_final_declaration
       (identifier) @font-lock-variable-name-face))
 
    :language language
