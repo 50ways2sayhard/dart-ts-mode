@@ -80,7 +80,8 @@
     "hide" "on" "class" "enum" "extends"
     "in" "is" "new" "return"
     "super" "with" "if" "else"
-    "try" "catch" "default" "switch")
+    "try" "catch" "default" "switch"
+    "throw" "rethrow")
   "Dart keywords for tree-sitter font-locking.")
 
 (defvar dart-ts-mode--builtins
