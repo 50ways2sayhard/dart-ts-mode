@@ -218,6 +218,11 @@ Argument LANGUAGE is `dart'."
       (identifier) @font-lock-variable-name-face))
 
    :language language
+   :feature 'assignment
+   `((assignment_expression
+      left: (assignable_expression (identifier) @font-lock-variable-name-face)))
+
+   :language language
    :feature 'property
    `((unconditional_assignable_selector
       (identifier) @font-lock-property-face)
