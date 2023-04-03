@@ -57,26 +57,37 @@
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
      ((node-is ">") parent-bol 0)
+     ((parent-is "(declaration (initializers))") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "comment") prev-adaptive-prefix 0)
      ((parent-is "class_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "enum_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "extension_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "formal_parameter_list") parent-bol dart-ts-mode-indent-offset)
+     ((parent-is "formal_parameter") parent-bol dart-ts-mode-indent-offset)
      ((match "formal_parameter" "optional_formal_parameters") parent-bol 0)
      ((parent-is "optional_formal_parameters") parent-bol dart-ts-mode-indent-offset)
-     ((parent-is "function_body") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "function_expression_body") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "switch_block") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "if_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "variable_declarator") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "list_literal") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "return_statement") parent-bol dart-ts-mode-indent-offset)
-     ((parent-is "arguments") parent-bol dart-ts-mode-indent-offset)
-     ((node-is "block") standalone-parent 0)
+     ;; ((parent-is "arguments") parent-bol dart-ts-mode-indent-offset)
+     ((parent-is "arguments") dart-ts-mode--arguments-indent-rule 0)
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
-     ((parent-is "parenthesized_expression") first-sibling dart-ts-mode-indent-offset)
+     ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
 
      (no-node parent-bol 0))))
+
+(defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
+  (let ((first-sibling (treesit-node-child parent 0 t)))
+    (if (and first-sibling (not (treesit-node-eq first-sibling node)))
+        (treesit-node-start first-sibling)
+      (progn
+        (save-excursion
+          (goto-char (treesit-node-start parent))
+          (back-to-indentation)
+          (+ (point) dart-ts-mode-indent-offset))))))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "yield" "sync*"
