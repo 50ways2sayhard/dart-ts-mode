@@ -53,6 +53,7 @@
      ((parent-is "program") column-0 0)
      ((match "}" "class_body") column-0 0)
      ((match "}" "optional_formal_parameters") standalone-parent 0)
+     ((match "}" "block") dart-ts-mode--block-indent-rule 0)
      ((node-is "}") parent-bol 0)
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
@@ -62,9 +63,9 @@
      ((parent-is "class_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "enum_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "extension_body") column-0 dart-ts-mode-indent-offset)
+     ((match "formal_parameter" "optional_formal_parameters") parent-bol 0)
      ((parent-is "formal_parameter_list") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "formal_parameter") parent-bol dart-ts-mode-indent-offset)
-     ((match "formal_parameter" "optional_formal_parameters") parent-bol 0)
      ((parent-is "optional_formal_parameters") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "function_expression_body") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "switch_block") parent-bol dart-ts-mode-indent-offset)
@@ -74,7 +75,9 @@
      ((parent-is "return_statement") parent-bol dart-ts-mode-indent-offset)
      ;; ((parent-is "arguments") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "arguments") dart-ts-mode--arguments-indent-rule 0)
+     ((n-p-gp nil "block" "function_body") dart-ts-mode--block-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
+
      ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
 
      (no-node parent-bol 0))))
@@ -88,6 +91,16 @@
           (goto-char (treesit-node-start parent))
           (back-to-indentation)
           (+ (point) dart-ts-mode-indent-offset))))))
+
+(defun dart-ts-mode--block-indent-rule (node parent &rest _)
+  (let ((maybe-signature (treesit-node-prev-sibling (treesit-node-parent parent))))
+    (if (and maybe-signature (or (string-match-p "function_signature" (treesit-node-string maybe-signature))
+                                 (string-match-p "method_signature" (treesit-node-string maybe-signature))))
+        (treesit-node-start maybe-signature)
+      (save-excursion
+        (goto-char (treesit-node-start parent))
+        (back-to-indentation)
+        (point)))))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "yield" "sync*"
