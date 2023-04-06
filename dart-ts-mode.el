@@ -53,7 +53,8 @@
      ((parent-is "program") column-0 0)
      ((match "}" "class_body") column-0 0)
      ((match "}" "optional_formal_parameters") standalone-parent 0)
-     ((match "}" "block") dart-ts-mode--block-indent-rule 0)
+     ((n-p-gp "}" "block" "if_statement") dart-ts-mode--if-statement-indent-rule 0)
+     ((match "}" "block") dart-ts-mode--function-body-indent-rule 0)
      ((node-is "}") parent-bol 0)
      ((node-is ")") parent-bol 0)
      ((node-is "]") parent-bol 0)
@@ -63,44 +64,70 @@
      ((parent-is "class_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "enum_body") column-0 dart-ts-mode-indent-offset)
      ((parent-is "extension_body") column-0 dart-ts-mode-indent-offset)
-     ((match "formal_parameter" "optional_formal_parameters") parent-bol 0)
      ((parent-is "formal_parameter_list") parent-bol dart-ts-mode-indent-offset)
-     ((parent-is "formal_parameter") parent-bol dart-ts-mode-indent-offset)
-     ((parent-is "optional_formal_parameters") parent-bol dart-ts-mode-indent-offset)
+     ((parent-is "optional_formal_parameters") dart-ts-mode--optional-formal-parameters-indent-rule 0)
+     ;; ((parent-is "formal_parameter") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "function_expression_body") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "switch_block") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "if_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "variable_declarator") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "list_literal") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "return_statement") parent-bol dart-ts-mode-indent-offset)
-     ;; ((parent-is "arguments") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "arguments") dart-ts-mode--arguments-indent-rule 0)
-     ((n-p-gp nil "block" "function_body") dart-ts-mode--block-indent-rule dart-ts-mode-indent-offset)
+     ((n-p-gp nil "block" "function_body") dart-ts-mode--function-body-indent-rule dart-ts-mode-indent-offset)
+     ((n-p-gp nil "block" "if_statement") dart-ts-mode--if-statement-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
-
      ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
 
      (no-node parent-bol 0))))
 
+(defun dart-ts-mode--node-bol (node)
+  "Return begining of line of NODE."
+  (save-excursion
+    (goto-char (treesit-node-start node))
+    (back-to-indentation)
+    (point)))
+
+(defun dart-ts-mode--parent-bol (node)
+  "Return parent's begining of line of NODE."
+  (dart-ts-mode--node-bol (treesit-node-parent node)))
+
+(defun dart-ts-mode--if-statement-indent-rule (_ parent &rest __)
+  "Indent rule for if_statement.
+If parent of PARENT (a.k.a grandparent) is if_statement,
+returns parent-bol of grandparent.Otherwise returns bol of grandparent."
+  (let ((gp (treesit-node-parent parent)))
+    (if (and (treesit-node-p gp)
+             (string= "if_statement" (treesit-node-string gp)))
+        (dart-ts-mode--parent-bol gp)
+      (dart-ts-mode--node-bol gp))))
+
 (defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
+  "Return indentation of argument list.
+If NODE is the first sibling of PARENT, returns bol of parent, or else returns
+starting point of first sibling."
   (let ((first-sibling (treesit-node-child parent 0 t)))
     (if (and first-sibling (not (treesit-node-eq first-sibling node)))
         (treesit-node-start first-sibling)
-      (progn
-        (save-excursion
-          (goto-char (treesit-node-start parent))
-          (back-to-indentation)
-          (+ (point) dart-ts-mode-indent-offset))))))
+      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
 
-(defun dart-ts-mode--block-indent-rule (node parent &rest _)
+(defun dart-ts-mode--function-body-indent-rule (_ parent &rest _)
+  "Return indentation of function_body.PARENT is always a block node."
   (let ((maybe-signature (treesit-node-prev-sibling (treesit-node-parent parent))))
-    (if (and maybe-signature (or (string-match-p "function_signature" (treesit-node-string maybe-signature))
-                                 (string-match-p "method_signature" (treesit-node-string maybe-signature))))
-        (treesit-node-start maybe-signature)
-      (save-excursion
-        (goto-char (treesit-node-start parent))
-        (back-to-indentation)
-        (point)))))
+    (if (and maybe-signature
+             (or (string-match-p "function_signature" (treesit-node-string maybe-signature))
+                 (string-match-p "method_signature" (treesit-node-string maybe-signature))))
+        (dart-ts-mode--node-bol maybe-signature)
+      (dart-ts-mode--node-bol parent))))
+
+(defun dart-ts-mode--optional-formal-parameters-indent-rule (_ parent &rest __)
+  "Return indentation of children of optional_formal_parameters.
+PARENT is always optional_formal_parameters."
+  (let ((parent-sibling (treesit-node-prev-sibling parent)))
+    (if (and (treesit-node-p parent-sibling)
+             (string= (treesit-node-string parent-sibling) "formal_parameter"))
+        (treesit-node-start parent-sibling)
+      (+ (dart-ts-mode--parent-bol parent) dart-ts-mode-indent-offset))))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "yield" "sync*"
