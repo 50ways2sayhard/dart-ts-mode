@@ -72,6 +72,7 @@
      ((parent-is "if_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "variable_declarator") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "list_literal") parent-bol dart-ts-mode-indent-offset)
+     ((parent-is "set_or_map_literal") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "return_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "arguments") dart-ts-mode--arguments-indent-rule 0)
      ((n-p-gp nil "block" "function_body") dart-ts-mode--function-body-indent-rule dart-ts-mode-indent-offset)
