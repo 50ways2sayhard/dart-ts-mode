@@ -208,7 +208,7 @@ Argument LANGUAGE is `dart'."
      ((template_substitution
        "$" @font-lock-variable-name-face
        "{" @font-lock-variable-name-face
-       "}" @font-lock-variable-name-face))
+       "}" @font-lock-variable-name-face) @font-lock-variable-name-face)
      (template_substitution
       "$" @font-lock-variable-name-face
       (identifier_dollar_escaped) @font-lock-variable-name-face)
