@@ -17,12 +17,17 @@
 
 (declare-function treesit-parser-create "treesit.c")
 
+(defgroup dart-ts nil
+  "Major mode for editing Dart code."
+  :prefix "dart-ts-"
+  :group 'languages)
+
 (defcustom dart-ts-mode-indent-offset 2
   "Number of spaces for each indentation step in `dart-ts-mode'."
   :version "29.1"
   :type 'integer
   :safe 'integerp
-  :group 'dart)
+  :group 'dart-ts)
 
 (defvar dart-ts-mode--syntax-table
   (let ((table (make-syntax-table)))
@@ -154,23 +159,21 @@ PARENT is always optional_formal_parameters."
     ">=" "<=" "||")
   "Dart operators for tree-sitter font-locking.")
 
-(defun dart-ts-mode--font-lock-settings (language)
-  "Tree-sitter font-lock settings.
-Argument LANGUAGE is `dart'."
+(defvar dart-ts-mode--font-lock-settings
   (treesit-font-lock-rules
-   :language language
+   :language 'dart
    :override t
    :feature 'comment
    `((comment) @font-lock-comment-face
      (documentation_comment) @font-lock-comment-face)
 
-   :language language
+   :language 'dart
    :feature 'constant
    `([(const_builtin)
       (final_builtin)
       (null_literal) (true) (false)] @font-lock-keyword-face)
 
-   :language language
+   :language 'dart
    :feature 'keyword
    `([,@dart-ts-mode--keywords] @font-lock-keyword-face
      [,@dart-ts-mode--builtins] @font-lock-builtin-face
@@ -184,7 +187,7 @@ Argument LANGUAGE is `dart'."
      "Function" @font-lock-type-face
      (throw_expression "throw" @font-lock-keyword-face) )
 
-   :language language
+   :language 'dart
    :override t
    :feature 'operator
    `([,@dart-ts-mode--operators
@@ -197,31 +200,31 @@ Argument LANGUAGE is `dart'."
       (ternary_expression ["?" ":"] @font-lock-operator-face)
       ([";" "." ","]) @font-lock-delimiter-face)
 
-   :language language
+   :language 'dart
    :feature 'bracket
    '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
 
-   :language language
+   :language 'dart
    :override t
    :feature 'string
    `((string_literal) @font-lock-string-face
      ((template_substitution
        "$" @font-lock-variable-name-face
        "{" @font-lock-variable-name-face
-       "}" @font-lock-variable-name-face))
+       "}" @font-lock-variable-name-face) @font-lock-variable-name-face)
      (template_substitution
       "$" @font-lock-variable-name-face
       (identifier_dollar_escaped) @font-lock-variable-name-face)
      (dotted_identifier_list) @font-lock-string-face)
 
-   :language language
+   :language 'dart
    :override t
    :feature 'literal
    `([(hex_integer_literal) (decimal_integer_literal) (decimal_floating_point_literal)] @font-lock-number-face
      (symbol_literal) @font-lock-constant-face
      [(true) (false) (null_literal)] @font-lock-constant-face)
 
-   :language language
+   :language 'dart
    :override t
    :feature 'type
    `((constructor_signature
@@ -245,7 +248,7 @@ Argument LANGUAGE is `dart'."
        name: (identifier) @font-lock-type-face)
       (:match "^[a-zA-Z]" @font-lock-type-face)))
 
-   :language language
+   :language 'dart
    :override t
    :feature 'annotation
    `((annotation
@@ -254,14 +257,14 @@ Argument LANGUAGE is `dart'."
      (marker_annotation
       name: (identifier) @font-lock-constant-face))
 
-   :language language
+   :language 'dart
    :feature 'method
    `((function_signature
       name: (identifier) @font-lock-function-name-face)
      (setter_signature
       name: (identifier) @font-lock-function-name-face))
 
-   :language language
+   :language 'dart
    :override t
    :feature 'definition
    `((class_definition
@@ -273,37 +276,37 @@ Argument LANGUAGE is `dart'."
      (static_final_declaration
       (identifier) @font-lock-variable-name-face))
 
-   :language language
+   :language 'dart
    :feature 'assignment
    `((assignment_expression
       left: (assignable_expression (identifier) @font-lock-variable-name-face)))
 
-   :language language
+   :language 'dart
    :feature 'property
    `((unconditional_assignable_selector
       (identifier) @font-lock-property-face)
      (conditional_assignable_selector
       (identifier) @font-lock-property-face))
 
-   :language language
+   :language 'dart
    :feature 'function
    `((super) @font-lock-function-call-face)
 
-   :language language
+   :language 'dart
    :feature 'number
    `([(hex_integer_literal)
       (decimal_integer_literal)
       (decimal_floating_point_literal)] @font-lock-number-face)
 
-   :language language
+   :language 'dart
    :feature 'delimiter
    `((["," "." ";" ":"]) @font-lock-delimiter-face)
 
-   :language language
+   :language 'dart
    :feature 'escape-sequence
    :override t
-   `((escape_sequence) @font-lock-escape-face)))
-
+   `((escape_sequence) @font-lock-escape-face))
+  "Tree-sitter font-lock settings for `dart-ts-mode'.")
 
 (defvar dart-ts-mode--sentence-nodes
   '(
@@ -351,11 +354,10 @@ Return nil if there is no name or if NODE is not a defun node."
       (treesit-node-child-by-field-name node "name")
       t))))
 
-
 ;;;###autoload
 (define-derived-mode dart-ts-mode prog-mode "Dart"
-  "Major mode for editing Dart."
-  :group 'dart
+  "Major mode for editing Dart, powered by tree-sitter."
+  :group 'dart-ts
   :syntax-table dart-ts-mode--syntax-table
 
   ;; Comments.
@@ -366,11 +368,12 @@ Return nil if there is no name or if NODE is not a defun node."
               (regexp-opt '("comment"
                             "template_string")))
 
-  ;; Electric
+  ;; Electric pair.
   (setq-local electric-indent-chars
               (append "{}():;," electric-indent-chars))
   (setq-local electric-layout-rules
-	            '((?\; . after) (?\{ . after) (?\} . before)))
+	      '((?\; . after) (?\{ . after) (?\} . before)))
+
   ;; Navigation.
   (setq-local treesit-defun-type-regexp
               (regexp-opt '("class_definition"
@@ -396,8 +399,7 @@ Return nil if there is no name or if NODE is not a defun node."
     (setq-local treesit-simple-indent-rules dart-ts-mode--indent-rules)
 
     ;; Font-lock.
-    (setq-local treesit-font-lock-settings
-                (dart-ts-mode--font-lock-settings 'dart))
+    (setq-local treesit-font-lock-settings dart-ts-mode--font-lock-settings)
     ;; FIXME More reasonable feature list.
     (setq-local treesit-font-lock-feature-list
                 '((comment escape-sequence)
