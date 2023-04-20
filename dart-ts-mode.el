@@ -370,15 +370,17 @@ Return nil if there is no name or if NODE is not a defun node."
   ;; Electric pair.
   (setq-local electric-indent-chars
               (append "{}():;," electric-indent-chars))
+
   (setq-local electric-layout-rules
-	            '((?\; . after) (?\{ . after) (?\} . before)))
+              '((?\; . after) (?\{ . after) (?\} . before)))
 
   ;; Navigation.
   (setq-local treesit-defun-type-regexp
               (regexp-opt '("class_definition"
                             "function_signature"
                             "enum_declaration")))
-  ;; TODO sexp, introduced in emacs30
+
+  ;; TODO sexp, introduced in Emacs 30.
   ;; (setq-local treesit-text-type-regexp
   ;;             (regexp-opt '("comment"
   ;;                           "template_string")))
@@ -393,7 +395,9 @@ Return nil if there is no name or if NODE is not a defun node."
               '(("Class" "\\`class_definition\\'" nil nil)
                 ("Enum" "\\`enum_declaration\\'" nil nil)
                 ("Method" "\\`function_signature\\'" nil nil)))
+
   (setq-local treesit-defun-name-function #'dart-ts-mode--defun-name)
+
   (when (treesit-ready-p 'dart)
     (treesit-parser-create 'dart)
 
@@ -402,6 +406,7 @@ Return nil if there is no name or if NODE is not a defun node."
 
     ;; Font-lock.
     (setq-local treesit-font-lock-settings dart-ts-mode--font-lock-settings)
+
     ;; FIXME More reasonable feature list.
     (setq-local treesit-font-lock-feature-list
                 '((comment escape-sequence)
