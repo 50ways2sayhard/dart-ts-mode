@@ -37,7 +37,6 @@ You can install this package manually or use your own package manager. Below are
 - Indentation
 - Imenu
 - Navigation
-- Sexp
 
 ** Roadmap
 
@@ -46,8 +45,39 @@ You can install this package manually or use your own package manager. Below are
 - [ ] Sexp feature introduced in Emacs 30.
 - [ ] Better navigation.
 
-** References
+** Integrations
+This section is about working with other packages, PRs of more examples are appreciated.
 
+*** Lsp client integration
+Personally I use =eglot= as lsp client:
+#+begin_src emacs-lisp
+(use-package dart-ts-mode
+  :load-path "<path-to-dart-ts-mode>"
+  :init
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 '(dart-ts-mode . ("dart" "language-server" "--client-id" "emacs.eglot-dart")))))
+#+end_src
+
+*** Code Formating
+I recommand [[https://github.com/radian-software/apheleia][apheleia]] , to work with it, add these lines to your init file:
+#+begin_src emacs-lisp
+(use-package apheleia
+  :commands (apheleia-format-buffer)
+  :init
+  (require 'apheleia-formatters)
+  (add-to-list 'apheleia-mode-alist '(dart-ts-mode . dart-format)))
+#+end_src
+Or you can format buffer with your lsp client.
+
+*** File Icon
+Add this line to your =all-this-icon= config:
+#+begin_src emacs-lisp
+(add-to-list 'all-the-icons-mode-icon-alist
+             '(dart-ts-mode all-the-icons-fileicon "dart" :height 1.0 :face all-the-icons-blue))
+#+end_src
+
+** References
 - [[https://github.com/bradyt/dart-mode][Dart-mode]]
 - [[https://github.com/nvim-treesitter/nvim-treesitter/tree/master/queries/dart][Nvim-treesitter query for Dart]]
 - [[https://github.com/emacs-mirror/emacs/blob/master/admin/notes/tree-sitter/starter-guide][Treesit starter guide]]
