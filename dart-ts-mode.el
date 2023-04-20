@@ -315,6 +315,9 @@ PARENT is always optional_formal_parameters."
     "expression_statement"
     "if_statement"
     "switch_statement"
+    "variable_declaration"
+    "formal_parameter"
+    "optional_formal_parameters"
     )
   "Nodes that designate sentences in Dart.
 See `treesit-sentence-type-regexp' for more information.")
@@ -364,28 +367,27 @@ Return nil if there is no name or if NODE is not a defun node."
   (c-ts-common-comment-setup)
   (setq-local treesit-defun-prefer-top-level t)
 
-  (setq-local treesit-text-type-regexp
-              (regexp-opt '("comment"
-                            "template_string")))
-
   ;; Electric pair.
   (setq-local electric-indent-chars
               (append "{}():;," electric-indent-chars))
   (setq-local electric-layout-rules
-	      '((?\; . after) (?\{ . after) (?\} . before)))
+	            '((?\; . after) (?\{ . after) (?\} . before)))
 
   ;; Navigation.
   (setq-local treesit-defun-type-regexp
               (regexp-opt '("class_definition"
                             "function_signature"
                             "enum_declaration")))
+  ;; TODO sexp, introduced in emacs30
+  ;; (setq-local treesit-text-type-regexp
+  ;;             (regexp-opt '("comment"
+  ;;                           "template_string")))
 
-  (setq-local treesit-sentence-type-regexp
-              (regexp-opt dart-ts-mode--sentence-nodes))
+  ;; (setq-local treesit-sentence-type-regexp
+  ;;             (regexp-opt dart-ts-mode--sentence-nodes))
 
-  ;; TODO sexp
-  (setq-local treesit-sexp-type-regexp
-              (regexp-opt dart-ts-mode--sexp-nodes))
+  ;; (setq-local treesit-sexp-type-regexp
+  ;;             (regexp-opt dart-ts-mode--sexp-nodes))
 
   (setq-local treesit-simple-imenu-settings
               '(("Class" "\\`class_definition\\'" nil nil)
