@@ -185,7 +185,8 @@ PARENT is always optional_formal_parameters."
      ((identifier) @font-lock-keyword-face
       (:match "^rethrow" @font-lock-keyword-face))
      "Function" @font-lock-type-face
-     (throw_expression "throw" @font-lock-keyword-face) )
+     (throw_expression "throw" @font-lock-keyword-face)
+     (while_statement "while" @font-lock-keyword-face))
 
    :language 'dart
    :override t
