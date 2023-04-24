@@ -7,24 +7,18 @@ A major mode for editing Dart files with the power of =treesit=, provides syntax
 You can install this package manually or use your own package manager. Below are intruductions to install:
 
 1. Clone this repo:
-
    #+begin_src bash
    $ git clone https://github.com/50ways2sayhard/dart-ts-mode /path/to/dart-ts-mode
    #+end_src
-
 2. Add below codes to your init file:
-
    #+begin_src emacs-lisp
    (use-package dart-ts-mode
      :load-path "/path/to/dart-ts-mode")
    #+end_src
-
 3. Add =tree-sitter-dart= to =treesit-language-source-alist=:
-
    #+begin_src emacs-lisp
    (add-to-list 'treesit-language-source-alist (cons dart ("https://github.com/UserNobody14/tree-sitter-dart")))
    #+end_src
-
 4. =M-x treesit-install-language-grammar= and select dart language.
 
 ** Screenshots
