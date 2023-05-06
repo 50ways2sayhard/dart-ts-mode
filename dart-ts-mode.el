@@ -73,7 +73,7 @@
      ((parent-is "optional_formal_parameters") dart-ts-mode--optional-formal-parameters-indent-rule 0)
      ;; ((parent-is "formal_parameter") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "function_expression_body") parent-bol dart-ts-mode-indent-offset)
-     ((parent-is "switch_block") parent-bol dart-ts-mode-indent-offset)
+     ((n-p-gp nil "switch_block" "switch_statement") dart-ts-mode--switch-case-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "if_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "variable_declarator") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "list_literal") parent-bol dart-ts-mode-indent-offset)
@@ -107,6 +107,14 @@ returns parent-bol of grandparent.Otherwise returns bol of grandparent."
              (string= "if_statement" (treesit-node-string gp)))
         (dart-ts-mode--parent-bol gp)
       (dart-ts-mode--node-bol gp))))
+
+(defun dart-ts-mode--switch-case-indent-rule (node parent &rest __)
+  "Indent rule for a NODE under switch_block.
+If NODE is either switch_label or nil, returns PARENT's bol.
+Otherwise returns PARENT's bol plus `dart-ts-mode-indent-offset'."
+  (if (or (string= "switch_label" (treesit-node-type node)) (not (treesit-node-type node)))
+      (dart-ts-mode--node-bol parent)
+    (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset)))
 
 (defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
   "Return indentation of argument list.
