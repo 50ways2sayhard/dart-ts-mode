@@ -110,9 +110,9 @@ returns parent-bol of grandparent.Otherwise returns bol of grandparent."
 
 (defun dart-ts-mode--switch-case-indent-rule (node parent &rest __)
   "Indent rule for a NODE under switch_block.
-If NODE is either switch_label or nil, returns PARENT's bol.
+If NODE is switch_label, returns PARENT's bol.
 Otherwise returns PARENT's bol plus `dart-ts-mode-indent-offset'."
-  (if (or (string= "switch_label" (treesit-node-type node)) (not (treesit-node-type node)))
+  (if (string= "switch_label" (treesit-node-type node))
       (dart-ts-mode--node-bol parent)
     (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset)))
 
