@@ -357,11 +357,12 @@ See `treesit-sexp-type-regexp' for more information.")
   "Return the defun name of NODE.
 Return nil if there is no name or if NODE is not a defun node."
   (pcase (treesit-node-type node)
-    ((or "method_signature"
-         "function_signature"
+    ((or "function_signature"
+         "method_signature"
+         "setter_signature"
+         "getter_signature"
          "class_definition"
-         "enum_declaration"
-         "import_specification")
+         "enum_declaration")
      (treesit-node-text
       (treesit-node-child-by-field-name node "name")
       t))))
@@ -383,20 +384,24 @@ Return nil if there is no name or if NODE is not a defun node."
   (setq-local electric-layout-rules
               '((?\; . after) (?\{ . after) (?\} . before)))
 
-  ;; Navigation.
   (setq-local treesit-defun-type-regexp
               (regexp-opt '("class_definition"
                             "function_signature"
+                            "getter_signature"
+                            "setter_signature"
+                            "constructor_signature"
+                            "constant_constructor_signature"
                             "enum_declaration")))
 
+
+  (setq-local treesit-text-type-regexp
+              (regexp-opt '("comment"
+                            "template_string")))
+
+  (setq-local treesit-sentence-type-regexp
+              (regexp-opt dart-ts-mode--sentence-nodes))
+
   ;; TODO sexp, introduced in Emacs 30.
-  ;; (setq-local treesit-text-type-regexp
-  ;;             (regexp-opt '("comment"
-  ;;                           "template_string")))
-
-  ;; (setq-local treesit-sentence-type-regexp
-  ;;             (regexp-opt dart-ts-mode--sentence-nodes))
-
   ;; (setq-local treesit-sexp-type-regexp
   ;;             (regexp-opt dart-ts-mode--sexp-nodes))
 
