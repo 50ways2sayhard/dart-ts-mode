@@ -185,7 +185,7 @@ PARENT is always optional_formal_parameters."
    :feature 'keyword
    `([,@dart-ts-mode--keywords] @font-lock-keyword-face
      [,@dart-ts-mode--builtins] @font-lock-builtin-face
-     (break_statement) @font-lock-keyword-face
+     [(break_statement) (continue_statement)] @font-lock-keyword-face
      [(this) (super) (inferred_type)] @font-lock-keyword-face
      (case_builtin) @font-lock-keyword-face
      ((identifier) @font-lock-type-face
