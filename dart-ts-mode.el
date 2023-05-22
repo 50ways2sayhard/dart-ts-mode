@@ -253,6 +253,8 @@ PARENT is always optional_formal_parameters."
      (type_alias
       (type_identifier) @font-lock-type-face)
      (void_type) @font-lock-type-face
+     (record_field
+      (label (identifier) @font-lock-type-face))
      ((scoped_identifier
        scope: (identifier) @font-lock-type-face
        name: (identifier) @font-lock-type-face)
