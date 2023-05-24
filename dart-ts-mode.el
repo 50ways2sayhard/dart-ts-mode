@@ -153,7 +153,7 @@ PARENT is always optional_formal_parameters."
     "await" "get" "interface" "show"
     "hide" "on" "class" "enum" "extends"
     "in" "is" "new" "return"
-    "super" "with" "if" "else" "when"
+    "super" "this" "with" "if" "else" "when"
     "try" "catch" "default" "switch")
   "Dart keywords for tree-sitter font-locking.")
 
@@ -300,11 +300,6 @@ PARENT is always optional_formal_parameters."
       (identifier) @font-lock-property-name-face)
      (conditional_assignable_selector
       (identifier) @font-lock-property-name-face))
-
-   :language 'dart
-   :feature 'function
-   :override t
-   `([(super) (this)] @font-lock-function-call-face)
 
    :language 'dart
    :feature 'number
