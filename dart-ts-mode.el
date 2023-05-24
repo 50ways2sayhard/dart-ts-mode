@@ -180,6 +180,7 @@ PARENT is always optional_formal_parameters."
      (documentation_comment) @font-lock-comment-face)
 
    :language 'dart
+   :override t
    :feature 'definition
    `((class_definition
       name: (identifier) @font-lock-type-face)
