@@ -176,18 +176,20 @@ PARENT is always optional_formal_parameters."
   (treesit-font-lock-rules
    :language 'dart
    :feature 'comment
-   `((comment) @font-lock-comment-face
+   '((comment) @font-lock-comment-face
      (documentation_comment) @font-lock-comment-face)
 
    :language 'dart
-   :override t
    :feature 'definition
-   `((class_definition
+   :override t
+   '((class_definition
       name: (identifier) @font-lock-type-face)
      (constant_pattern
-      (identifier) @font-lock-variable-name-face)
+      (identifier) @font-lock-variable-use-face)
      (object_pattern
       ((identifier) @font-lock-variable-name-face))
+     (switch_statement_case
+      (identifier) @font-lock-variable-name-face)
      (named_argument
       (label (identifier) @font-lock-variable-name-face))
      (record_field
@@ -211,21 +213,21 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'constant
-   `([(const_builtin)
-      (final_builtin)
-      (null_literal) (true) (false)] @font-lock-keyword-face)
+   '([(null_literal) (true) (false)] @font-lock-constant-face)
 
    :language 'dart
    :feature 'keyword
-   `([,@dart-ts-mode--keywords] @font-lock-keyword-face
-     [,@dart-ts-mode--builtins] @font-lock-builtin-face
-     [(break_statement) (continue_statement)] @font-lock-keyword-face
-     (case_builtin) @font-lock-keyword-face
+   `([,@dart-ts-mode--keywords
+      (break_statement)
+      (continue_statement)] @font-lock-keyword-face
+     [,@dart-ts-mode--builtins
+      (const_builtin)
+      (final_builtin)
+      (case_builtin)] @font-lock-builtin-face
      ((identifier) @font-lock-type-face
       (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
      ((identifier) @font-lock-keyword-face
       (:match "^rethrow" @font-lock-keyword-face))
-     "Function" @font-lock-type-face
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (for_statement "for" @font-lock-keyword-face))
@@ -239,8 +241,8 @@ PARENT is always optional_formal_parameters."
       (prefix_operator)
       (equality_operator)
       (additive_operator)] @font-lock-operator-face
-      (ternary_expression ["?" ":"] @font-lock-operator-face)
-      ([";" "." ","]) @font-lock-delimiter-face)
+     (ternary_expression ["?" ":"] @font-lock-operator-face)
+     ([";" "." ","]) @font-lock-delimiter-face)
 
    :language 'dart
    :feature 'bracket
@@ -248,33 +250,31 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'string
-   `((string_literal) @font-lock-string-face
-     ((template_substitution
-       "$" @font-lock-variable-name-face
-       "{" @font-lock-variable-name-face
-       "}" @font-lock-variable-name-face) @font-lock-variable-name-face)
-     (template_substitution
-      "$" @font-lock-variable-name-face
-      (identifier_dollar_escaped) @font-lock-variable-name-face)
+   :override t
+   '((string_literal) @font-lock-string-face
+     (template_substitution) @font-lock-variable-name-face
      (dotted_identifier_list) @font-lock-string-face)
 
    :language 'dart
    :feature 'literal
-   `([(hex_integer_literal) (decimal_integer_literal) (decimal_floating_point_literal)] @font-lock-number-face
-     (symbol_literal) @font-lock-constant-face
+   :override t
+   '((symbol_literal) @font-lock-constant-face
      [(true) (false) (null_literal)] @font-lock-constant-face)
 
    :language 'dart
    :feature 'type
-   `((type_identifier) @font-lock-type-face
-     (inferred_type) @font-lock-type-face
+   :override t
+   '((type_identifier) @font-lock-type-face
+     [(inferred_type)
+      (void_type)
+      (nullable_type)
+      (function_type)] @font-lock-type-face
      (enum_declaration
       name: (identifier) @font-lock-type-face)
      (scoped_identifier
       scope: (identifier) @font-lock-type-face)
      (type_alias
       (type_identifier) @font-lock-type-face)
-     (void_type) @font-lock-type-face
      ((scoped_identifier
        scope: (identifier) @font-lock-type-face
        name: (identifier) @font-lock-type-face)
@@ -283,16 +283,16 @@ PARENT is always optional_formal_parameters."
    :language 'dart
    :feature 'assignment
    `((assignment_expression
-      left: (assignable_expression (identifier) @font-lock-variable-use-face)))
+      left: (assignable_expression
+             (identifier) @font-lock-variable-use-face)))
 
    :language 'dart
    :feature 'annotation
-   `((annotation
+   :override t
+   '((annotation
       "@" @font-lock-constant-face
       name: (identifier) @font-lock-constant-face)
-     (marker_annotation
-      "@" @font-lock-constant-face
-      name: (identifier) @font-lock-constant-face))
+     (marker_annotation) @font-lock-constant-face)
 
    :language 'dart
    :feature 'property
@@ -303,18 +303,23 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'number
-   `([(hex_integer_literal)
+   '([(hex_integer_literal)
       (decimal_integer_literal)
       (decimal_floating_point_literal)] @font-lock-number-face)
 
    :language 'dart
    :feature 'delimiter
-   `((["," "." ";" ":"]) @font-lock-delimiter-face)
+   '((["," "." ";" ":"]) @font-lock-delimiter-face)
 
    :language 'dart
    :feature 'escape-sequence
    :override t
-   `((escape_sequence) @font-lock-escape-face))
+   '((escape_sequence) @font-lock-escape-face)
+
+   :language 'dart
+   :feature 'error
+   :override t
+   '((ERROR) @font-lock-warning-face))
   "Tree-sitter font-lock settings for `dart-ts-mode'.")
 
 (defvar dart-ts-mode--sentence-nodes
@@ -425,7 +430,7 @@ Return nil if there is no name or if NODE is not a defun node."
                   ( keyword string type)
                   ( assignment constant annotation number literal
                     escape-sequence expression property)
-                  ( delimiter operator bracket)))
+                  ( delimiter operator bracket error)))
 
     (treesit-major-mode-setup))
   )
