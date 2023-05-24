@@ -65,7 +65,7 @@ I recommand [[https://github.com/radian-software/apheleia][apheleia]] , to work 
 Or you can format buffer with your lsp client.
 
 *** File Icon
-Add this line to your =all-this-icon= config:
+Add this line to your =all-the-icons= config:
 #+begin_src emacs-lisp
 (add-to-list 'all-the-icons-mode-icon-alist
              '(dart-ts-mode all-the-icons-fileicon "dart" :height 1.0 :face all-the-icons-blue))
