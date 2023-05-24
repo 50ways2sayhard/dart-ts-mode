@@ -35,8 +35,8 @@ You can install this package manually or use your own package manager. Below are
 ** Roadmap
 
 - [X] Font-lock for =template_substitution=.
-- [ ] Better =which-function-mode= support, includes displaying function name in function body.
-- [ ] Sexp feature introduced in Emacs 30.
+- [ ] +Better =which-function-mode= support, includes displaying function name in function body.+ [[https://github.com/joaotavora/breadcrumb][breadcrumb-mode]] is recommended.
+- [X] Sexp feature introduced in Emacs 30.
 - [ ] Better navigation.
 
 ** Integrations
