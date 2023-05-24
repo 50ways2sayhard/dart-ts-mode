@@ -87,16 +87,16 @@
 
      (no-node parent-bol 0))))
 
-(defun dart-ts-mode--node-bol (node)
-  "Return begining of line of NODE."
+(defun dart-ts-mode--node-start (node)
+  "Return the NODE's start position."
   (save-excursion
     (goto-char (treesit-node-start node))
     (back-to-indentation)
     (point)))
 
-(defun dart-ts-mode--parent-bol (node)
-  "Return parent's begining of line of NODE."
-  (dart-ts-mode--node-bol (treesit-node-parent node)))
+(defun dart-ts-mode--parent-start (node)
+  "Return the position of the first character of NODE's parent."
+  (dart-ts-mode--node-start (treesit-node-parent node)))
 
 (defun dart-ts-mode--if-statement-indent-rule (_ parent &rest __)
   "Indent rule for if_statement.
@@ -105,16 +105,21 @@ returns parent-bol of grandparent.Otherwise returns bol of grandparent."
   (let ((gp (treesit-node-parent parent)))
     (if (and (treesit-node-p gp)
              (string= "if_statement" (treesit-node-string gp)))
-        (dart-ts-mode--parent-bol gp)
-      (dart-ts-mode--node-bol gp))))
+        (dart-ts-mode--parent-start gp)
+      (dart-ts-mode--node-start gp))))
 
 (defun dart-ts-mode--switch-case-indent-rule (node parent &rest __)
   "Indent rule for a NODE under switch_block.
-If NODE is switch_label, returns PARENT's bol.
-Otherwise returns PARENT's bol plus `dart-ts-mode-indent-offset'."
-  (if (string= "switch_label" (treesit-node-type node))
-      (dart-ts-mode--node-bol parent)
-    (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset)))
+If NODE is switch's label, returns PARENT's start position.
+Otherwise returns PARENT's start position plus
+`dart-ts-mode-indent-offset'."
+  (let ((parent-start (dart-ts-mode--node-start parent))
+        (node-name (treesit-node-type node)))
+    (if (or (string= "switch_label" node-name)
+            (string= "switch_statement_case" node-name)
+            (string= "switch_statement_default" node-name))
+        parent-start
+      (+ parent-start dart-ts-mode-indent-offset))))
 
 (defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
   "Return indentation of argument list.
@@ -123,7 +128,7 @@ starting point of first sibling."
   (let ((first-sibling (treesit-node-child parent 0 t)))
     (if (and first-sibling (not (treesit-node-eq first-sibling node)))
         (treesit-node-start first-sibling)
-      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
+      (+ (dart-ts-mode--node-start parent) dart-ts-mode-indent-offset))))
 
 (defun dart-ts-mode--function-body-indent-rule (_ parent &rest _)
   "Return indentation of function_body.PARENT is always a block node."
@@ -131,8 +136,8 @@ starting point of first sibling."
     (if (and maybe-signature
              (or (string-match-p "function_signature" (treesit-node-string maybe-signature))
                  (string-match-p "method_signature" (treesit-node-string maybe-signature))))
-        (dart-ts-mode--node-bol maybe-signature)
-      (dart-ts-mode--node-bol parent))))
+        (dart-ts-mode--node-start maybe-signature)
+      (dart-ts-mode--node-start parent))))
 
 (defun dart-ts-mode--optional-formal-parameters-indent-rule (_ parent &rest __)
   "Return indentation of children of optional_formal_parameters.
@@ -141,24 +146,24 @@ PARENT is always optional_formal_parameters."
     (if (and (treesit-node-p parent-sibling)
              (string= (treesit-node-string parent-sibling) "formal_parameter"))
         (treesit-node-start parent-sibling)
-      (+ (dart-ts-mode--parent-bol parent) dart-ts-mode-indent-offset))))
+      (+ (dart-ts-mode--parent-start parent) dart-ts-mode-indent-offset))))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "yield" "sync*"
     "await" "get" "interface" "show"
     "hide" "on" "class" "enum" "extends"
     "in" "is" "new" "return"
-    "super" "with" "if" "else"
+    "super" "with" "if" "else" "when"
     "try" "catch" "default" "switch")
   "Dart keywords for tree-sitter font-locking.")
 
 (defvar dart-ts-mode--builtins
-  '("abstract" "as" "covariant" "deferred"
+  '("abstract" "as" "base" "covariant" "deferred"
     "dynamic" "export" "extension" "external"
     "factory" "Function" "get" "implements"
     "import" "interface" "late" "library"
     "mixin" "operator" "part" "required"
-    "set" "static" "typedef")
+    "sealed" "set" "static" "typedef")
   "Dart builtins for tree-sitter font locking.")
 
 (defvar dart-ts-mode--operators
@@ -170,10 +175,38 @@ PARENT is always optional_formal_parameters."
 (defvar dart-ts-mode--font-lock-settings
   (treesit-font-lock-rules
    :language 'dart
-   :override t
    :feature 'comment
    `((comment) @font-lock-comment-face
      (documentation_comment) @font-lock-comment-face)
+
+   :language 'dart
+   :feature 'definition
+   `((class_definition
+      name: (identifier) @font-lock-type-face)
+     (constant_pattern
+      (identifier) @font-lock-variable-name-face)
+     (object_pattern
+      ((identifier) @font-lock-variable-name-face))
+     (named_argument
+      (label (identifier) @font-lock-variable-name-face))
+     (record_field
+      (label (identifier) @font-lock-variable-name-face))
+     (initialized_identifier
+      (identifier) @font-lock-variable-name-face)
+     (initialized_variable_definition
+      name: (identifier) @font-lock-variable-name-face)
+     (static_final_declaration
+      (identifier) @font-lock-variable-name-face)
+     (constant_constructor_signature
+      (identifier) @font-lock-function-name-face)
+     (constructor_signature
+      name: (identifier) @font-lock-function-name-face)
+     (function_signature
+      name: (identifier) @font-lock-function-name-face)
+     (getter_signature
+      name: (identifier) @font-lock-function-name-face)
+     (setter_signature
+      name: (identifier) @font-lock-function-name-face))
 
    :language 'dart
    :feature 'constant
@@ -186,7 +219,6 @@ PARENT is always optional_formal_parameters."
    `([,@dart-ts-mode--keywords] @font-lock-keyword-face
      [,@dart-ts-mode--builtins] @font-lock-builtin-face
      [(break_statement) (continue_statement)] @font-lock-keyword-face
-     [(this) (super) (inferred_type)] @font-lock-keyword-face
      (case_builtin) @font-lock-keyword-face
      ((identifier) @font-lock-type-face
       (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
@@ -198,7 +230,6 @@ PARENT is always optional_formal_parameters."
      (for_statement "for" @font-lock-keyword-face))
 
    :language 'dart
-   :override t
    :feature 'operator
    `([,@dart-ts-mode--operators
       (multiplicative_operator)
@@ -215,7 +246,6 @@ PARENT is always optional_formal_parameters."
    '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
 
    :language 'dart
-   :override t
    :feature 'string
    `((string_literal) @font-lock-string-face
      ((template_substitution
@@ -228,70 +258,40 @@ PARENT is always optional_formal_parameters."
      (dotted_identifier_list) @font-lock-string-face)
 
    :language 'dart
-   :override t
    :feature 'literal
    `([(hex_integer_literal) (decimal_integer_literal) (decimal_floating_point_literal)] @font-lock-number-face
      (symbol_literal) @font-lock-constant-face
      [(true) (false) (null_literal)] @font-lock-constant-face)
 
    :language 'dart
-   :override t
    :feature 'type
-   `((constructor_signature
+   `((type_identifier) @font-lock-type-face
+     (inferred_type) @font-lock-type-face
+     (enum_declaration
       name: (identifier) @font-lock-type-face)
      (scoped_identifier
       scope: (identifier) @font-lock-type-face)
-     (function_signature
-      name: (identifier) @font-lock-function-name-face)
-     (getter_signature
-      (identifier) @font-lock-function-name-face)
-     (setter_signature
-      name: (identifier) @font-lock-function-name-face)
-     (enum_declaration
-      name: (identifier) @font-lock-type-face)
-     (type_identifier) @font-lock-type-face
      (type_alias
       (type_identifier) @font-lock-type-face)
      (void_type) @font-lock-type-face
-     (record_field
-      (label (identifier) @font-lock-type-face))
      ((scoped_identifier
        scope: (identifier) @font-lock-type-face
        name: (identifier) @font-lock-type-face)
       (:match "^[a-zA-Z]" @font-lock-type-face)))
 
    :language 'dart
-   :override t
-   :feature 'annotation
-   `((annotation
-      name: (identifier) @font-lock-constant-face)
-     ["@"] @font-lock-constant-face
-     (marker_annotation
-      name: (identifier) @font-lock-constant-face))
-
-   :language 'dart
-   :feature 'method
-   `((function_signature
-      name: (identifier) @font-lock-function-name-face)
-     (setter_signature
-      name: (identifier) @font-lock-function-name-face))
-
-   :language 'dart
-   :override t
-   :feature 'definition
-   `((class_definition
-      name: (identifier) @font-lock-type-face)
-     (initialized_identifier
-      (identifier) @font-lock-variable-name-face)
-     (initialized_variable_definition
-      name: (identifier) @font-lock-variable-name-face)
-     (static_final_declaration
-      (identifier) @font-lock-variable-name-face))
-
-   :language 'dart
    :feature 'assignment
    `((assignment_expression
-      left: (assignable_expression (identifier) @font-lock-variable-name-face)))
+      left: (assignable_expression (identifier) @font-lock-variable-use-face)))
+
+   :language 'dart
+   :feature 'annotation
+   `((annotation
+      "@" @font-lock-constant-face
+      name: (identifier) @font-lock-constant-face)
+     (marker_annotation
+      "@" @font-lock-constant-face
+      name: (identifier) @font-lock-constant-face))
 
    :language 'dart
    :feature 'property
@@ -302,7 +302,8 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'function
-   `((super) @font-lock-function-call-face)
+   :override t
+   `([(super) (this)] @font-lock-function-call-face)
 
    :language 'dart
    :feature 'number
@@ -322,14 +323,15 @@ PARENT is always optional_formal_parameters."
 
 (defvar dart-ts-mode--sentence-nodes
   '(
-    "import_statement"
+    "assert_statement"
     "debugger_statement"
     "expression_statement"
+    "formal_parameter"
     "if_statement"
+    "import_statement"
+    "optional_formal_parameters"
     "switch_statement"
     "variable_declaration"
-    "formal_parameter"
-    "optional_formal_parameters"
     )
   "Nodes that designate sentences in Dart.
 See `treesit-sentence-type-regexp' for more information.")
@@ -423,13 +425,12 @@ Return nil if there is no name or if NODE is not a defun node."
 
     ;; Font-lock.
     (setq-local treesit-font-lock-settings dart-ts-mode--font-lock-settings)
-
-    ;; FIXME More reasonable feature list.
     (setq-local treesit-font-lock-feature-list
-                '((comment escape-sequence)
-                  (constant keyword string type assignment definition)
-                  (annotation expression literal property)
-                  (bracket delimiter operator number)))
+                '(( comment definition)
+                  ( keyword string type)
+                  ( assignment constant annotation number literal
+                    escape-sequence expression property)
+                  ( delimiter operator bracket)))
 
     (treesit-major-mode-setup))
   )
