@@ -183,14 +183,18 @@ PARENT is always optional_formal_parameters."
    :override t
    '((class_definition
       name: (identifier) @font-lock-type-face)
-     (constant_pattern
-      (identifier) @font-lock-variable-use-face)
      (object_pattern
       ((identifier) @font-lock-variable-name-face))
-     (switch_statement_case
+     (constant_pattern
+      (identifier) @font-lock-variable-name-face)
+     (variable_pattern
       (identifier) @font-lock-variable-name-face)
      (record_field
       (label (identifier) @font-lock-variable-name-face))
+     (relational_expression
+      (identifier) @font-lock-variable-name-face)
+     (switch_statement_case
+      (identifier) @font-lock-variable-name-face)
      (initialized_identifier
       (identifier) @font-lock-variable-name-face)
      (initialized_variable_definition
@@ -290,6 +294,8 @@ PARENT is always optional_formal_parameters."
    `((unconditional_assignable_selector
       (identifier) @font-lock-property-name-face)
      (conditional_assignable_selector
+      (identifier) @font-lock-property-name-face)
+     (qualified
       (identifier) @font-lock-property-name-face))
 
    :language 'dart
