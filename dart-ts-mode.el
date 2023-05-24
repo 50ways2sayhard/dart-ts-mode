@@ -149,12 +149,11 @@ PARENT is always optional_formal_parameters."
       (+ (dart-ts-mode--parent-start parent) dart-ts-mode-indent-offset))))
 
 (defvar dart-ts-mode--keywords
-  '("async" "async*" "yield" "sync*"
-    "await" "get" "interface" "show"
-    "hide" "on" "class" "enum" "extends"
-    "in" "is" "new" "return"
-    "super" "this" "with" "if" "else" "when"
-    "try" "catch" "default" "switch")
+  '("async" "async*" "await" "catch" "class"
+    "default" "else" "enum" "extends" "get" "hide"
+    "if" "in" "interface" "is" "new" "on" "return"
+    "show" "super" "switch" "sync*" "this"
+    "try" "when" "with" "yield")
   "Dart keywords for tree-sitter font-locking.")
 
 (defvar dart-ts-mode--builtins
@@ -217,25 +216,25 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'keyword
-   `([,@dart-ts-mode--keywords
-      (break_statement)
-      (continue_statement)] @font-lock-keyword-face
-     [,@dart-ts-mode--builtins
-      (const_builtin)
-      (final_builtin)
-      (case_builtin)] @font-lock-builtin-face
+   `([,@dart-ts-mode--keywords] @font-lock-keyword-face
+     [(break_statement) (continue_statement)] @font-lock-keyword-face
+     [,@dart-ts-mode--builtins] @font-lock-builtin-face
+     [(const_builtin) (final_builtin) (case_builtin)] @font-lock-builtin-face
      ((identifier) @font-lock-type-face
       (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
      ((identifier) @font-lock-keyword-face
       (:match "^rethrow" @font-lock-keyword-face))
+     (yield_each_statement
+      "yield" @font-lock-keyword-face
+      "*" @font-lock-keyword-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (for_statement "for" @font-lock-keyword-face))
 
    :language 'dart
    :feature 'operator
-   `([,@dart-ts-mode--operators
-      (multiplicative_operator)
+   `([,@dart-ts-mode--operators] @font-lock-operator-face
+     [(multiplicative_operator)
       (increment_operator)
       (is_operator)
       (prefix_operator)
