@@ -402,9 +402,8 @@ Return nil if there is no name or if NODE is not a defun node."
   (setq-local treesit-sentence-type-regexp
               (regexp-opt dart-ts-mode--sentence-nodes))
 
-  ;; TODO sexp, introduced in Emacs 30.
-  ;; (setq-local treesit-sexp-type-regexp
-  ;;             (regexp-opt dart-ts-mode--sexp-nodes))
+  (setq-local treesit-sexp-type-regexp
+              (regexp-opt dart-ts-mode--sexp-nodes))
 
   (setq-local treesit-simple-imenu-settings
               '(("Class" "\\`class_definition\\'" nil nil)
