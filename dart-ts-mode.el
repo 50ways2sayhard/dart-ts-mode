@@ -381,7 +381,9 @@ Return nil if there is no name or if NODE is not a defun node."
 
   ;; Comments.
   (c-ts-common-comment-setup)
-  (setq-local treesit-defun-prefer-top-level t)
+
+  ;; Compile.
+  (setq-local compile-command "dart")
 
   ;; Electric pair.
   (setq-local electric-indent-chars
@@ -390,35 +392,36 @@ Return nil if there is no name or if NODE is not a defun node."
   (setq-local electric-layout-rules
               '((?\; . after) (?\{ . after) (?\} . before)))
 
-  (setq-local treesit-defun-type-regexp
-              (regexp-opt '("class_definition"
-                            "function_signature"
-                            "getter_signature"
-                            "setter_signature"
-                            "constructor_signature"
-                            "constant_constructor_signature"
-                            "enum_declaration")))
-
-
-  (setq-local treesit-text-type-regexp
-              (regexp-opt '("comment"
-                            "template_string")))
-
-  (setq-local treesit-sentence-type-regexp
-              (regexp-opt dart-ts-mode--sentence-nodes))
-
-  (setq-local treesit-sexp-type-regexp
-              (regexp-opt dart-ts-mode--sexp-nodes))
-
-  (setq-local treesit-simple-imenu-settings
-              '(("Class" "\\`class_definition\\'" nil nil)
-                ("Enum" "\\`enum_declaration\\'" nil nil)
-                ("Method" "\\`function_signature\\'" nil nil)))
-
-  (setq-local treesit-defun-name-function #'dart-ts-mode--defun-name)
-
   (when (treesit-ready-p 'dart)
     (treesit-parser-create 'dart)
+
+    (setq-local treesit-defun-prefer-top-level t)
+
+    (setq-local treesit-defun-type-regexp
+                (regexp-opt '("class_definition"
+                              "function_signature"
+                              "getter_signature"
+                              "setter_signature"
+                              "constructor_signature"
+                              "constant_constructor_signature"
+                              "enum_declaration")))
+
+    (setq-local treesit-text-type-regexp
+                (regexp-opt '("comment"
+                              "template_string")))
+
+    (setq-local treesit-sentence-type-regexp
+                (regexp-opt dart-ts-mode--sentence-nodes))
+
+    (setq-local treesit-sexp-type-regexp
+                (regexp-opt dart-ts-mode--sexp-nodes))
+
+    (setq-local treesit-simple-imenu-settings
+                '(("Class" "\\`class_definition\\'" nil nil)
+                  ("Enum" "\\`enum_declaration\\'" nil nil)
+                  ("Method" "\\`function_signature\\'" nil nil)))
+
+    (setq-local treesit-defun-name-function #'dart-ts-mode--defun-name)
 
     ;; Indent.
     (setq-local treesit-simple-indent-rules dart-ts-mode--indent-rules)
