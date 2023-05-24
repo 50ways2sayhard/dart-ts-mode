@@ -189,8 +189,6 @@ PARENT is always optional_formal_parameters."
       ((identifier) @font-lock-variable-name-face))
      (switch_statement_case
       (identifier) @font-lock-variable-name-face)
-     (named_argument
-      (label (identifier) @font-lock-variable-name-face))
      (record_field
       (label (identifier) @font-lock-variable-name-face))
      (initialized_identifier
@@ -211,10 +209,6 @@ PARENT is always optional_formal_parameters."
       name: (identifier) @font-lock-function-name-face))
 
    :language 'dart
-   :feature 'constant
-   '([(null_literal) (true) (false)] @font-lock-constant-face)
-
-   :language 'dart
    :feature 'keyword
    `([,@dart-ts-mode--keywords] @font-lock-keyword-face
      [(break_statement) (continue_statement)] @font-lock-keyword-face
@@ -232,33 +226,11 @@ PARENT is always optional_formal_parameters."
      (for_statement "for" @font-lock-keyword-face))
 
    :language 'dart
-   :feature 'operator
-   `([,@dart-ts-mode--operators] @font-lock-operator-face
-     [(multiplicative_operator)
-      (increment_operator)
-      (is_operator)
-      (prefix_operator)
-      (equality_operator)
-      (additive_operator)] @font-lock-operator-face
-     (ternary_expression ["?" ":"] @font-lock-operator-face)
-     ([";" "." ","]) @font-lock-delimiter-face)
-
-   :language 'dart
-   :feature 'bracket
-   '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
-
-   :language 'dart
    :feature 'string
    :override t
    '((string_literal) @font-lock-string-face
      (template_substitution) @font-lock-variable-name-face
      (dotted_identifier_list) @font-lock-string-face)
-
-   :language 'dart
-   :feature 'literal
-   :override t
-   '((symbol_literal) @font-lock-constant-face
-     [(true) (false) (null_literal)] @font-lock-constant-face)
 
    :language 'dart
    :feature 'type
@@ -286,12 +258,32 @@ PARENT is always optional_formal_parameters."
              (identifier) @font-lock-variable-use-face)))
 
    :language 'dart
+   :feature 'constant
+   '([(true) (false)] @font-lock-constant-face)
+
+   :language 'dart
+   :feature 'number
+   '([(hex_integer_literal)
+      (decimal_integer_literal)
+      (decimal_floating_point_literal)] @font-lock-number-face)
+
+   :language 'dart
+   :feature 'literal
+   :override t
+   '([(null_literal) (symbol_literal)] @font-lock-constant-face)
+
+   :language 'dart
    :feature 'annotation
    :override t
    '((annotation
       "@" @font-lock-constant-face
       name: (identifier) @font-lock-constant-face)
      (marker_annotation) @font-lock-constant-face)
+
+   :language 'dart
+   :feature 'escape-sequence
+   :override t
+   '((escape_sequence) @font-lock-escape-face)
 
    :language 'dart
    :feature 'property
@@ -301,19 +293,23 @@ PARENT is always optional_formal_parameters."
       (identifier) @font-lock-property-name-face))
 
    :language 'dart
-   :feature 'number
-   '([(hex_integer_literal)
-      (decimal_integer_literal)
-      (decimal_floating_point_literal)] @font-lock-number-face)
-
-   :language 'dart
    :feature 'delimiter
    '((["," "." ";" ":"]) @font-lock-delimiter-face)
 
    :language 'dart
-   :feature 'escape-sequence
-   :override t
-   '((escape_sequence) @font-lock-escape-face)
+   :feature 'operator
+   `([,@dart-ts-mode--operators] @font-lock-operator-face
+     [(multiplicative_operator)
+      (increment_operator)
+      (is_operator)
+      (prefix_operator)
+      (equality_operator)
+      (additive_operator)] @font-lock-operator-face
+     (ternary_expression ["?" ":"] @font-lock-operator-face))
+
+   :language 'dart
+   :feature 'bracket
+   '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
 
    :language 'dart
    :feature 'error
@@ -430,8 +426,8 @@ Return nil if there is no name or if NODE is not a defun node."
     (setq-local treesit-font-lock-feature-list
                 '(( comment definition)
                   ( keyword string type)
-                  ( assignment constant annotation number literal
-                    escape-sequence expression property)
+                  ( assignment constant number literal
+                    annotation escape-sequence property)
                   ( delimiter operator bracket error)))
 
     (treesit-major-mode-setup))
