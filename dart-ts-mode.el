@@ -291,11 +291,13 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'property
-   `((unconditional_assignable_selector
+   `((cascade_selector
       (identifier) @font-lock-property-name-face)
      (conditional_assignable_selector
       (identifier) @font-lock-property-name-face)
      (qualified
+      (identifier) @font-lock-property-name-face)
+     (unconditional_assignable_selector
       (identifier) @font-lock-property-name-face))
 
    :language 'dart
