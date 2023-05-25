@@ -215,19 +215,20 @@ PARENT is always optional_formal_parameters."
    :language 'dart
    :feature 'keyword
    `([,@dart-ts-mode--keywords] @font-lock-keyword-face
-     [(break_statement) (continue_statement)] @font-lock-keyword-face
      [,@dart-ts-mode--builtins] @font-lock-builtin-face
+     [(break_statement) (continue_statement)] @font-lock-keyword-face
      [(const_builtin) (final_builtin) (case_builtin)] @font-lock-builtin-face
+     [(super) (this)] @font-lock-function-call-face
      ((identifier) @font-lock-type-face
       (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
      ((identifier) @font-lock-keyword-face
       (:match "^rethrow" @font-lock-keyword-face))
-     (yield_each_statement
-      "yield" @font-lock-keyword-face
-      "*" @font-lock-keyword-face)
+     (for_statement "for" @font-lock-keyword-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
-     (for_statement "for" @font-lock-keyword-face))
+     (yield_each_statement
+      "yield" @font-lock-keyword-face
+      "*" @font-lock-keyword-face))
 
    :language 'dart
    :feature 'string
@@ -257,7 +258,7 @@ PARENT is always optional_formal_parameters."
 
    :language 'dart
    :feature 'assignment
-   `((assignment_expression
+   '((assignment_expression
       left: (assignable_expression
              (identifier) @font-lock-variable-use-face)))
 
