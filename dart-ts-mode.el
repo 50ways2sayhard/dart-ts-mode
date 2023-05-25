@@ -195,6 +195,10 @@ PARENT is always optional_formal_parameters."
       (identifier) @font-lock-variable-name-face)
      (switch_statement_case
       (identifier) @font-lock-variable-name-face)
+     (combinator
+      (identifier) @font-lock-variable-use-face)
+     (import_specification
+      (identifier) @font-lock-variable-use-face)
      (initialized_identifier
       (identifier) @font-lock-variable-name-face)
      (initialized_variable_definition
