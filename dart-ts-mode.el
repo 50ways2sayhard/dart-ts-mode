@@ -228,6 +228,7 @@ PARENT is always optional_formal_parameters."
      ((identifier) @font-lock-keyword-face
       (:match "^rethrow" @font-lock-keyword-face))
      (for_statement "for" @font-lock-keyword-face)
+     (finally_clause "finally" @font-lock-keyword-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (yield_each_statement
