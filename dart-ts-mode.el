@@ -346,27 +346,6 @@ PARENT is always optional_formal_parameters."
   "Nodes that designate sentences in Dart.
 See `treesit-sentence-type-regexp' for more information.")
 
-(defvar dart-ts-mode--sexp-nodes
-  '("expression"
-    "pattern"
-    "array"
-    "function"
-    "string"
-    "escape"
-    "template"
-    "regex"
-    "number"
-    "identifier"
-    "this"
-    "super"
-    "true"
-    "false"
-    "null"
-    "arguments"
-    "pair")
-  "Nodes that designate sexps in Dart.
-See `treesit-sexp-type-regexp' for more information.")
-
 ;; TODO function name
 (defun dart-ts-mode--defun-name (node)
   "Return the defun name of NODE.
@@ -422,8 +401,13 @@ Return nil if there is no name or if NODE is not a defun node."
     (setq-local treesit-sentence-type-regexp
                 (regexp-opt dart-ts-mode--sentence-nodes))
 
-    (setq-local treesit-sexp-type-regexp
-                (regexp-opt dart-ts-mode--sexp-nodes))
+    ;; (setq-local treesit-sexp-type-regexp
+    ;;             (rx bol
+    ;;                 (or "block" "body" "identifier" "_expression"
+    ;;                     "expression_statement" "marker_annotation"
+    ;;                     "true" "false" "this" "super" "null"
+    ;;                     )
+    ;;                 eol))
 
     (setq-local treesit-simple-imenu-settings
                 '(("Class" "\\`class_definition\\'" nil nil)
