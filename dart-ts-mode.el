@@ -287,8 +287,7 @@ PARENT is always optional_formal_parameters."
    :override t
    '((annotation
       "@" @font-lock-constant-face
-      name: (identifier) @font-lock-constant-face)
-     (marker_annotation) @font-lock-constant-face)
+      name: (identifier) @font-lock-constant-face))
 
    :language 'dart
    :feature 'escape-sequence
