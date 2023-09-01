@@ -229,6 +229,7 @@ PARENT is always optional_formal_parameters."
       (:match "^rethrow" @font-lock-keyword-face))
      (for_statement "for" @font-lock-keyword-face)
      (finally_clause "finally" @font-lock-keyword-face)
+     (part_of_directive "of" @font-lock-builtin-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (yield_each_statement
@@ -402,10 +403,9 @@ Return nil if there is no name or if NODE is not a defun node."
 
     ;; (setq-local treesit-sexp-type-regexp
     ;;             (rx bol
-    ;;                 (or "block" "body" "identifier" "_expression"
-    ;;                     "expression_statement" "marker_annotation"
-    ;;                     "true" "false" "this" "super" "null"
-    ;;                     )
+    ;;                 (or "block" "body" "identifier" "annotation"
+    ;;                     "_expression" "expression_statement"
+    ;;                     "true" "false" "this" "super" "null")
     ;;                 eol))
 
     (setq-local treesit-simple-imenu-settings
