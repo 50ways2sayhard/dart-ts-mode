@@ -186,7 +186,7 @@ PARENT is always optional_formal_parameters."
   "Nodes that designate sentences in Dart.")
 
 (defvar dart-ts-mode--text-nodes
-  '("comment" "template_string")
+  '("comment" "string_literal")
   "Nodes that designate texts in Dart.")
 
 ;;;; Font-lock.
