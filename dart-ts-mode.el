@@ -171,6 +171,26 @@ PARENT is always optional_formal_parameters."
     ">=" "<=" "||")
   "Dart operators for tree-sitter font-locking.")
 
+;;;; Things.
+
+(defvar dart-ts-mode--sentence-nodes
+  '("assert_statement"
+    "debugger_statement"
+    "expression_statement"
+    "formal_parameter"
+    "if_statement"
+    "import_statement"
+    "optional_formal_parameters"
+    "switch_statement"
+    "variable_declaration")
+  "Nodes that designate sentences in Dart.")
+
+(defvar dart-ts-mode--text-nodes
+  '("comment" "string_literal")
+  "Nodes that designate texts in Dart.")
+
+;;;; Font-lock.
+
 (defvar dart-ts-mode--font-lock-settings
   (treesit-font-lock-rules
    :language 'dart
@@ -331,22 +351,6 @@ PARENT is always optional_formal_parameters."
    '((ERROR) @font-lock-warning-face))
   "Tree-sitter font-lock settings for `dart-ts-mode'.")
 
-(defvar dart-ts-mode--sentence-nodes
-  '(
-    "assert_statement"
-    "debugger_statement"
-    "expression_statement"
-    "formal_parameter"
-    "if_statement"
-    "import_statement"
-    "optional_formal_parameters"
-    "switch_statement"
-    "variable_declaration"
-    )
-  "Nodes that designate sentences in Dart.
-See `treesit-sentence-type-regexp' for more information.")
-
-;; TODO function name
 (defun dart-ts-mode--defun-name (node)
   "Return the defun name of NODE.
 Return nil if there is no name or if NODE is not a defun node."
@@ -394,26 +398,32 @@ Return nil if there is no name or if NODE is not a defun node."
                               "constant_constructor_signature"
                               "enum_declaration")))
 
-    (setq-local treesit-text-type-regexp
-                (regexp-opt '("comment"
-                              "template_string")))
+    (setq-local treesit-defun-name-function #'dart-ts-mode--defun-name)
 
-    (setq-local treesit-sentence-type-regexp
-                (regexp-opt dart-ts-mode--sentence-nodes))
-
-    ;; (setq-local treesit-sexp-type-regexp
-    ;;             (rx bol
-    ;;                 (or "block" "body" "identifier" "annotation"
-    ;;                     "_expression" "expression_statement"
-    ;;                     "true" "false" "this" "super" "null")
-    ;;                 eol))
+    (if (boundp 'treesit-thing-settings)
+        ;; Emacs 30+.
+        (setq-local treesit-thing-settings
+                    `((dart
+                       ;; It's more useful to include semicolons as sexp so
+                       ;; that users can move to the end of a statement.
+                       (sexp (not ,(rx (or "{" "}" "[" "]" "(" ")" ","))))
+                       (sentence ,(regexp-opt dart-ts-mode--sentence-nodes))
+                       (text ,(regexp-opt dart-ts-mode--text-nodes)))))
+      ;; (setq-local treesit-sexp-type-regexp
+      ;;             (rx bol
+      ;;                 (or "block" "body" "identifier" "annotation"
+      ;;                     "_expression" "expression_statement"
+      ;;                     "true" "false" "this" "super" "null")
+      ;;                 eol))
+      (setq-local treesit-sentence-type-regexp
+                  (regexp-opt dart-ts-mode--sentence-nodes))
+      (setq-local treesit-text-type-regexp
+                  (regexp-opt dart-ts-mode--text-nodes)))
 
     (setq-local treesit-simple-imenu-settings
                 '(("Class" "\\`class_definition\\'" nil nil)
                   ("Enum" "\\`enum_declaration\\'" nil nil)
                   ("Method" "\\`function_signature\\'" nil nil)))
-
-    (setq-local treesit-defun-name-function #'dart-ts-mode--defun-name)
 
     ;; Indent.
     (setq-local treesit-simple-indent-rules dart-ts-mode--indent-rules)
@@ -427,8 +437,7 @@ Return nil if there is no name or if NODE is not a defun node."
                     annotation escape-sequence property)
                   ( delimiter operator bracket error)))
 
-    (treesit-major-mode-setup))
-  )
+    (treesit-major-mode-setup)))
 
 (if (treesit-ready-p 'dart)
     (add-to-list 'auto-mode-alist '("\\.dart\\'" . dart-ts-mode)))
