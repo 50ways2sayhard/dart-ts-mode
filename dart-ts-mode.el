@@ -74,6 +74,7 @@
      ;; ((parent-is "formal_parameter") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "function_expression_body") parent-bol dart-ts-mode-indent-offset)
      ((n-p-gp nil "switch_block" "switch_statement") dart-ts-mode--switch-case-indent-rule dart-ts-mode-indent-offset)
+     ((parent-is "switch_expression") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "if_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "variable_declarator") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "list_literal") parent-bol dart-ts-mode-indent-offset)
