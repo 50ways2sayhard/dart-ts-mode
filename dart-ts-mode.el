@@ -87,6 +87,7 @@
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
      ((node-is "'''") parent-bol 0)
+     ((node-is "cascade_section") parent-bol dart-ts-mode-indent-offset)
 
      (no-node parent-bol 0))))
 
