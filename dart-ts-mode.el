@@ -82,6 +82,7 @@
      ((parent-is "return_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "arguments") dart-ts-mode--arguments-indent-rule 0)
      ((n-p-gp nil "block" "function_body") dart-ts-mode--function-body-indent-rule dart-ts-mode-indent-offset)
+     ((n-p-gp nil "block" "function_expression_body") dart-ts-mode--function-body-indent-rule dart-ts-mode-indent-offset)
      ((n-p-gp nil "block" "if_statement") dart-ts-mode--if-statement-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
@@ -89,39 +90,37 @@
 
      (no-node parent-bol 0))))
 
-(defun dart-ts-mode--node-start (node)
-  "Return the NODE's start position."
+(defun dart-ts-mode--node-bol (node)
+  "Return NODE's bol position."
   (save-excursion
     (goto-char (treesit-node-start node))
     (back-to-indentation)
     (point)))
 
 (defun dart-ts-mode--parent-start (node)
-  "Return the position of the first character of NODE's parent."
-  (dart-ts-mode--node-start (treesit-node-parent node)))
+  "Return the position of NODE's parent."
+  (treesit-node-start (treesit-node-parent node)))
 
-(defun dart-ts-mode--if-statement-indent-rule (_ parent &rest __)
+(defun dart-ts-mode--if-statement-indent-rule (_node parent &rest _)
   "Indent rule for if_statement.
-If parent of PARENT (a.k.a grandparent) is if_statement,
-returns parent-bol of grandparent.Otherwise returns bol of grandparent."
+If parent of PARENT (a.k.a grandparent) is if_statement, returns
+parent of grandparent.  Otherwise returns bol of grandparent."
   (let ((gp (treesit-node-parent parent)))
-    (if (and (treesit-node-p gp)
-             (string= "if_statement" (treesit-node-string gp)))
+    (if (string= "if_statement" (treesit-node-string gp))
         (dart-ts-mode--parent-start gp)
-      (dart-ts-mode--node-start gp))))
+      (dart-ts-mode--node-bol gp))))
 
-(defun dart-ts-mode--switch-case-indent-rule (node parent &rest __)
+(defun dart-ts-mode--switch-case-indent-rule (node parent &rest _)
   "Indent rule for a NODE under switch_block.
-If NODE is switch's label, returns PARENT's start position.
-Otherwise returns PARENT's start position plus
-`dart-ts-mode-indent-offset'."
-  (let ((parent-start (dart-ts-mode--node-start parent))
+If NODE is switch's label, returns PARENT's parent .  Otherwise
+returns grandparent's plus `dart-ts-mode-indent-offset'."
+  (let ((gp-start (treesit-node-start (treesit-node-parent parent)))
         (node-name (treesit-node-type node)))
     (if (or (string= "switch_label" node-name)
             (string= "switch_statement_case" node-name)
             (string= "switch_statement_default" node-name))
-        parent-start
-      (+ parent-start dart-ts-mode-indent-offset))))
+        gp-start
+      (+ gp-start dart-ts-mode-indent-offset))))
 
 (defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
   "Return indentation of argument list.
@@ -130,25 +129,41 @@ starting point of first sibling."
   (let ((first-sibling (treesit-node-child parent 0 t)))
     (if (and first-sibling (not (treesit-node-eq first-sibling node)))
         (treesit-node-start first-sibling)
-      (+ (dart-ts-mode--node-start parent) dart-ts-mode-indent-offset))))
+      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
 
-(defun dart-ts-mode--function-body-indent-rule (_ parent &rest _)
-  "Return indentation of function_body.PARENT is always a block node."
-  (let ((maybe-signature (treesit-node-prev-sibling (treesit-node-parent parent))))
-    (if (and maybe-signature
-             (or (string-match-p "function_signature" (treesit-node-string maybe-signature))
-                 (string-match-p "method_signature" (treesit-node-string maybe-signature))))
-        (dart-ts-mode--node-start maybe-signature)
-      (dart-ts-mode--node-start parent))))
+(defun dart-ts-mode--function-body-indent-rule (_node parent &rest _)
+  "Indent rule for NODE inside function body.
+PARENT is alway block here.  If the previous sibling of NODE's
+grandparent is a signature, return signature's start position.
+If NODE is inside a function expression, then return the
+expression's start position or parent bol according to whether
+the function_expression is existed as an argument.  Otherwise
+return the indentation of NODE's PARENT, which is always a block
+node."
+  (let* ((gp (treesit-node-parent parent))
+         (gp-name (treesit-node-type gp))
+         (gp-ps (treesit-node-prev-sibling gp))
+         (gp-ps-name (treesit-node-type gp-ps))
+         (ggp (treesit-node-parent gp)))
+    (cond
+     ((string-match-p "\\(function\\|method\\)_signature" gp-ps-name)
+      (treesit-node-start gp-ps))
+     ((string= "function_expression_body" gp-name)
+      (if (string-match-p (rx (or "argument" "parenthesized_expression"
+                                  "return_statement"))
+                          (treesit-node-type (treesit-node-parent ggp)))
+          ;; Return parent bol if function_expression is an argument.
+          (dart-ts-mode--node-bol parent)
+        (treesit-node-start ggp)))
+     (t (dart-ts-mode--node-bol parent)))))
 
-(defun dart-ts-mode--optional-formal-parameters-indent-rule (_ parent &rest __)
+(defun dart-ts-mode--optional-formal-parameters-indent-rule (_node parent &rest _)
   "Return indentation of children of optional_formal_parameters.
 PARENT is always optional_formal_parameters."
-  (let ((parent-sibling (treesit-node-prev-sibling parent)))
-    (if (and (treesit-node-p parent-sibling)
-             (string= (treesit-node-string parent-sibling) "formal_parameter"))
-        (treesit-node-start parent-sibling)
-      (+ (dart-ts-mode--parent-start parent) dart-ts-mode-indent-offset))))
+  (let ((formal-sib (treesit-node-prev-sibling parent "formal_parameter")))
+    (if (treesit-node-p formal-sib)
+        (treesit-node-start formal-sib)
+      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "await" "catch" "class"
