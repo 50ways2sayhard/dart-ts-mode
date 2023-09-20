@@ -97,7 +97,7 @@
     (point)))
 
 (defun dart-ts-mode--parent-start (node)
-  "Return the position of the first character of NODE's parent."
+  "Return the position of NODE's parent."
   (treesit-node-start (treesit-node-parent node)))
 
 (defun dart-ts-mode--if-statement-indent-rule (_node parent &rest _)
@@ -156,14 +156,13 @@ node."
         (treesit-node-start ggp)))
      (t (dart-ts-mode--node-bol parent)))))
 
-(defun dart-ts-mode--optional-formal-parameters-indent-rule (_ parent &rest __)
+(defun dart-ts-mode--optional-formal-parameters-indent-rule (_node parent &rest _)
   "Return indentation of children of optional_formal_parameters.
 PARENT is always optional_formal_parameters."
-  (let ((parent-sibling (treesit-node-prev-sibling parent)))
-    (if (and (treesit-node-p parent-sibling)
-             (string= (treesit-node-string parent-sibling) "formal_parameter"))
-        (treesit-node-start parent-sibling)
-      (+ (dart-ts-mode--parent-start parent) dart-ts-mode-indent-offset))))
+  (let ((formal-sib (treesit-node-prev-sibling parent "formal_parameter")))
+    (if (treesit-node-p formal-sib)
+        (treesit-node-start formal-sib)
+      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "await" "catch" "class"
