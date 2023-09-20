@@ -85,6 +85,7 @@
      ((n-p-gp nil "block" "if_statement") dart-ts-mode--if-statement-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
+     ((node-is "'''") parent-bol 0)
 
      (no-node parent-bol 0))))
 
