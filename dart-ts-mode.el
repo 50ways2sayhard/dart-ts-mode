@@ -100,27 +100,26 @@
   "Return the position of the first character of NODE's parent."
   (treesit-node-start (treesit-node-parent node)))
 
-(defun dart-ts-mode--if-statement-indent-rule (_ parent &rest __)
+(defun dart-ts-mode--if-statement-indent-rule (_node parent &rest _)
   "Indent rule for if_statement.
-If parent of PARENT (a.k.a grandparent) is if_statement,
-returns parent-bol of grandparent.Otherwise returns bol of grandparent."
+If parent of PARENT (a.k.a grandparent) is if_statement, returns
+parent of grandparent.  Otherwise returns bol of grandparent."
   (let ((gp (treesit-node-parent parent)))
-    (if (and (treesit-node-p gp)
-             (string= "if_statement" (treesit-node-string gp)))
+    (if (string= "if_statement" (treesit-node-string gp))
         (dart-ts-mode--parent-start gp)
       (dart-ts-mode--node-bol gp))))
 
-(defun dart-ts-mode--switch-case-indent-rule (node parent &rest __)
+(defun dart-ts-mode--switch-case-indent-rule (node parent &rest _)
   "Indent rule for a NODE under switch_block.
-If NODE is switch's label, returns PARENT's bol.  Otherwise
-returns PARENT's bol plus `dart-ts-mode-indent-offset'."
-  (let ((parent-bol (dart-ts-mode--node-bol parent))
+If NODE is switch's label, returns PARENT's parent .  Otherwise
+returns grandparent's plus `dart-ts-mode-indent-offset'."
+  (let ((gp-start (treesit-node-start (treesit-node-parent parent)))
         (node-name (treesit-node-type node)))
     (if (or (string= "switch_label" node-name)
             (string= "switch_statement_case" node-name)
             (string= "switch_statement_default" node-name))
-        parent-bol
-      (+ parent-bol dart-ts-mode-indent-offset))))
+        gp-start
+      (+ gp-start dart-ts-mode-indent-offset))))
 
 (defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
   "Return indentation of argument list.
