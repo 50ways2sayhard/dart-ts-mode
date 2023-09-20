@@ -82,6 +82,7 @@
      ((parent-is "return_statement") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "arguments") dart-ts-mode--arguments-indent-rule 0)
      ((n-p-gp nil "block" "function_body") dart-ts-mode--function-body-indent-rule dart-ts-mode-indent-offset)
+     ((n-p-gp nil "block" "function_expression_body") dart-ts-mode--function-body-indent-rule dart-ts-mode-indent-offset)
      ((n-p-gp nil "block" "if_statement") dart-ts-mode--if-statement-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "block") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "parenthesized_expression") parent-bol dart-ts-mode-indent-offset)
@@ -89,7 +90,7 @@
      (no-node parent-bol 0))))
 
 (defun dart-ts-mode--node-start (node)
-  "Return the NODE's start position."
+  "Return NODE's start position."
   (save-excursion
     (goto-char (treesit-node-start node))
     (back-to-indentation)
@@ -131,14 +132,31 @@ starting point of first sibling."
         (treesit-node-start first-sibling)
       (+ (dart-ts-mode--node-start parent) dart-ts-mode-indent-offset))))
 
-(defun dart-ts-mode--function-body-indent-rule (_ parent &rest _)
-  "Return indentation of function_body.PARENT is always a block node."
-  (let ((maybe-signature (treesit-node-prev-sibling (treesit-node-parent parent))))
-    (if (and maybe-signature
-             (or (string-match-p "function_signature" (treesit-node-string maybe-signature))
-                 (string-match-p "method_signature" (treesit-node-string maybe-signature))))
-        (dart-ts-mode--node-start maybe-signature)
-      (dart-ts-mode--node-start parent))))
+(defun dart-ts-mode--function-body-indent-rule (_node parent &rest _)
+  "Indent rule for NODE inside function body.
+PARENT is alway block here.  If the previous sibling of NODE's
+grandparent is a signature, return signature's start position.
+If NODE is inside a function expression, then return the
+expression's start position or parent bol according to whether
+the function_expression is existed as an argument.  Otherwise
+return the indentation of NODE's PARENT, which is always a block
+node."
+  (let* ((gp (treesit-node-parent parent))
+         (gp-name (treesit-node-type gp))
+         (gp-ps (treesit-node-prev-sibling gp))
+         (gp-ps-name (treesit-node-type gp-ps))
+         (ggp (treesit-node-parent gp)))
+    (cond
+     ((string-match-p "\\(function\\|method\\)_signature" gp-ps-name)
+      (treesit-node-start gp-ps))
+     ((string= "function_expression_body" gp-name)
+      (if (string-match-p (rx (or "argument" "parenthesized_expression"
+                                  "return_statement"))
+                          (treesit-node-type (treesit-node-parent ggp)))
+          ;; Return parent bol if function_expression is an argument.
+          (dart-ts-mode--node-bol parent)
+        (treesit-node-start ggp)))
+     (t (dart-ts-mode--node-bol parent)))))
 
 (defun dart-ts-mode--optional-formal-parameters-indent-rule (_ parent &rest __)
   "Return indentation of children of optional_formal_parameters.
