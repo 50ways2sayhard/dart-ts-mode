@@ -89,8 +89,8 @@
 
      (no-node parent-bol 0))))
 
-(defun dart-ts-mode--node-start (node)
-  "Return NODE's start position."
+(defun dart-ts-mode--node-bol (node)
+  "Return NODE's bol position."
   (save-excursion
     (goto-char (treesit-node-start node))
     (back-to-indentation)
@@ -98,7 +98,7 @@
 
 (defun dart-ts-mode--parent-start (node)
   "Return the position of the first character of NODE's parent."
-  (dart-ts-mode--node-start (treesit-node-parent node)))
+  (treesit-node-start (treesit-node-parent node)))
 
 (defun dart-ts-mode--if-statement-indent-rule (_ parent &rest __)
   "Indent rule for if_statement.
@@ -108,20 +108,19 @@ returns parent-bol of grandparent.Otherwise returns bol of grandparent."
     (if (and (treesit-node-p gp)
              (string= "if_statement" (treesit-node-string gp)))
         (dart-ts-mode--parent-start gp)
-      (dart-ts-mode--node-start gp))))
+      (dart-ts-mode--node-bol gp))))
 
 (defun dart-ts-mode--switch-case-indent-rule (node parent &rest __)
   "Indent rule for a NODE under switch_block.
-If NODE is switch's label, returns PARENT's start position.
-Otherwise returns PARENT's start position plus
-`dart-ts-mode-indent-offset'."
-  (let ((parent-start (dart-ts-mode--node-start parent))
+If NODE is switch's label, returns PARENT's bol.  Otherwise
+returns PARENT's bol plus `dart-ts-mode-indent-offset'."
+  (let ((parent-bol (dart-ts-mode--node-bol parent))
         (node-name (treesit-node-type node)))
     (if (or (string= "switch_label" node-name)
             (string= "switch_statement_case" node-name)
             (string= "switch_statement_default" node-name))
-        parent-start
-      (+ parent-start dart-ts-mode-indent-offset))))
+        parent-bol
+      (+ parent-bol dart-ts-mode-indent-offset))))
 
 (defun dart-ts-mode--arguments-indent-rule (node parent &rest _)
   "Return indentation of argument list.
@@ -130,7 +129,7 @@ starting point of first sibling."
   (let ((first-sibling (treesit-node-child parent 0 t)))
     (if (and first-sibling (not (treesit-node-eq first-sibling node)))
         (treesit-node-start first-sibling)
-      (+ (dart-ts-mode--node-start parent) dart-ts-mode-indent-offset))))
+      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
 
 (defun dart-ts-mode--function-body-indent-rule (_node parent &rest _)
   "Indent rule for NODE inside function body.
