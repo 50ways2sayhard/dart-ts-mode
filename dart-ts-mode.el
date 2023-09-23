@@ -76,6 +76,7 @@
      ((n-p-gp nil "switch_block" "switch_statement") dart-ts-mode--switch-case-indent-rule dart-ts-mode-indent-offset)
      ((parent-is "switch_expression") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "if_statement") parent-bol dart-ts-mode-indent-offset)
+     ((parent-is "if_element") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "variable_declarator") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "list_literal") parent-bol dart-ts-mode-indent-offset)
      ((parent-is "set_or_map_literal") parent-bol dart-ts-mode-indent-offset)
@@ -113,7 +114,7 @@ parent of grandparent.  Otherwise returns bol of grandparent."
 
 (defun dart-ts-mode--switch-case-indent-rule (node parent &rest _)
   "Indent rule for a NODE under switch_block.
-If NODE is switch's label, returns PARENT's parent .  Otherwise
+If NODE is switch's label, returns PARENT's parent.  Otherwise
 returns grandparent's plus `dart-ts-mode-indent-offset'."
   (let ((gp-start (treesit-node-start (treesit-node-parent parent)))
         (node-name (treesit-node-type node)))
