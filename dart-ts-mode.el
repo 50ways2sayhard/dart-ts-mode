@@ -223,6 +223,8 @@ PARENT is always optional_formal_parameters."
    :override t
    '((class_definition
       name: (identifier) @font-lock-type-face)
+     (class_definition
+      "final" @font-lock-builtin-face)
      (object_pattern
       ((identifier) @font-lock-variable-name-face))
      (constant_pattern
