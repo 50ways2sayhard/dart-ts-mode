@@ -387,6 +387,17 @@ Return nil if there is no name or if NODE is not a defun node."
       (treesit-node-child-by-field-name node "name")
       t))))
 
+(defun dart-ts-mode--electric-pair-string-delimiter ()
+  "Insert corresponding multi-line string for `electric-pair-mode'."
+  (when (and electric-pair-mode
+             (memq last-command-event '(?\" ?\'))
+             (let ((count 0))
+               (while (eq (char-before (- (point) count)) last-command-event)
+                 (cl-incf count))
+               (= count 3))
+             (eq (char-after) last-command-event))
+    (save-excursion (insert (make-string 2 last-command-event)))))
+
 ;;;###autoload
 (define-derived-mode dart-ts-mode prog-mode "Dart"
   "Major mode for editing Dart, powered by tree-sitter."
@@ -405,6 +416,10 @@ Return nil if there is no name or if NODE is not a defun node."
 
   (setq-local electric-layout-rules
               '((?\; . after) (?\{ . after) (?\} . before)))
+
+  ;; Add """ ... """ pairing to `electric-pair-mode'.
+  (add-hook 'post-self-insert-hook
+            #'dart-ts-mode--electric-pair-string-delimiter 'append t)
 
   (when (treesit-ready-p 'dart)
     (treesit-parser-create 'dart)
