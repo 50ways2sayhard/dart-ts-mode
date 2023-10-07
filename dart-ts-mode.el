@@ -153,7 +153,7 @@ node."
       (treesit-node-start gp-ps))
      ((string= "function_expression_body" gp-name)
       (if (string-match-p (rx (or "argument" "parenthesized_expression"
-                                  "return_statement"))
+                                  "return_statement" "record_field" "named_argument"))
                           (treesit-node-type (treesit-node-parent ggp)))
           ;; Return parent bol if function_expression is an argument.
           (dart-ts-mode--node-bol parent)
