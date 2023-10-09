@@ -178,10 +178,9 @@ If there is no match, it returns the start position of ggp."
 (defun dart-ts-mode--optional-formal-parameters-indent-rule (_node parent &rest _)
   "Return indentation of children of optional_formal_parameters.
 PARENT is always optional_formal_parameters."
-  (let ((formal-sib (treesit-node-prev-sibling parent "formal_parameter")))
-    (if (treesit-node-p formal-sib)
-        (treesit-node-start formal-sib)
-      (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset))))
+  (if-let ((formal-sib (treesit-node-prev-sibling parent "formal_parameter")))
+      (treesit-node-start formal-sib)
+    (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset)))
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "await" "catch" "class"
