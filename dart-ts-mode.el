@@ -205,6 +205,15 @@ PARENT is always optional_formal_parameters."
     ">=" "<=" "||")
   "Dart operators for tree-sitter font-locking.")
 
+(defvar dart-ts-mode--imenu-settings
+  '(("Class" "\\`class_definition\\'")
+    ("Enum" "\\`enum_declaration\\'")
+    ("Method" "\\`function_signature\\'")
+    ("Mixin" "\\`mixin_declaration\\'" nil dart-ts-mode--mixin-name))
+  "The value for `treesit-simple-imenu-settings'.
+By default `treesit-defun-name-function' is used to extract
+definition names.")
+
 ;;;; Things.
 
 (defvar dart-ts-mode--sentence-nodes
@@ -389,7 +398,7 @@ PARENT is always optional_formal_parameters."
 
 (defun dart-ts-mode--defun-name (node)
   "Return the defun name of NODE.
-Return nil if there is no name or if NODE is not a defun node."
+Return nil if there is no name or NODE is not a defun node."
   (pcase (treesit-node-type node)
     ((or "function_signature"
          "method_signature"
@@ -400,6 +409,12 @@ Return nil if there is no name or if NODE is not a defun node."
      (treesit-node-text
       (treesit-node-child-by-field-name node "name")
       t))))
+
+(defun dart-ts-mode--mixin-name (node)
+  "Return the name of mixin NODE.
+Return nil if there is no name or NODE."
+  (when (string-equal "mixin_declaration" (treesit-node-type node))
+    (treesit-node-text (treesit-node-child node 1) t)))
 
 (defun dart-ts-mode--electric-pair-string-delimiter ()
   "Insert corresponding multi-line string for `electric-pair-mode'."
@@ -471,10 +486,7 @@ Return nil if there is no name or if NODE is not a defun node."
       (setq-local treesit-text-type-regexp
                   (regexp-opt dart-ts-mode--text-nodes)))
 
-    (setq-local treesit-simple-imenu-settings
-                '(("Class" "\\`class_definition\\'" nil nil)
-                  ("Enum" "\\`enum_declaration\\'" nil nil)
-                  ("Method" "\\`function_signature\\'" nil nil)))
+    (setq-local treesit-simple-imenu-settings dart-ts-mode--imenu-settings)
 
     ;; Indent.
     (setq-local treesit-simple-indent-rules dart-ts-mode--indent-rules)
