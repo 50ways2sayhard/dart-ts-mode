@@ -172,8 +172,8 @@ If there is no match, it returns the start position of ggp."
     (if (treesit-node-match-p
          (treesit-node-parent ggp)
          (rx (or "argument" "parenthesized_expression"
-                 "return_statement" "record_field" "named_argument")))
-        (dart-ts-mode--node-bol parent)
+                 "return_statement" "record_field" "named_argument" "assignment_expression")))
+        (dart-ts-mode--node-bol (treesit-node-parent ggp))
       (treesit-node-start ggp))))
 
 (defun dart-ts-mode--optional-formal-parameters-indent-rule (_node parent &rest _)
