@@ -249,6 +249,8 @@ definition names.")
       name: (identifier) @font-lock-type-face)
      (class_definition
       "final" @font-lock-builtin-face)
+     ((identifier) @font-lock-type-face
+      (:match "\\`_?[A-Z]" @font-lock-type-face))
      (object_pattern
       ((identifier) @font-lock-variable-name-face))
      (constant_pattern
@@ -289,8 +291,6 @@ definition names.")
      [(break_statement) (continue_statement)] @font-lock-keyword-face
      [(const_builtin) (final_builtin) (case_builtin)] @font-lock-builtin-face
      [(super) (this)] @font-lock-function-call-face
-     ((identifier) @font-lock-type-face
-      (:match "^_?[A-Z].*[a-z]" @font-lock-type-face))
      ((identifier) @font-lock-keyword-face
       (:match "^rethrow" @font-lock-keyword-face))
      (for_statement "for" @font-lock-keyword-face)
