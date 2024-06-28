@@ -186,7 +186,7 @@ PARENT is always optional_formal_parameters."
 (defvar dart-ts-mode--keywords
   '("async" "async*" "await" "catch" "class"
     "default" "else" "enum" "extends" "get" "hide"
-    "if" "in" "interface" "is" "new" "on" "return"
+    "if" "in" "is" "new" "on" "return"
     "show" "super" "switch" "sync*" "this"
     "try" "when" "with" "yield")
   "Dart keywords for tree-sitter font-locking.")
@@ -243,12 +243,31 @@ definition names.")
      (documentation_comment) @font-lock-comment-face)
 
    :language 'dart
-   :feature 'definition
+   :feature 'keyword
    :override t
+   `([,@dart-ts-mode--keywords] @font-lock-keyword-face
+     [,@dart-ts-mode--builtins] @font-lock-builtin-face
+     [(break_statement) (continue_statement)] @font-lock-keyword-face
+     [(const_builtin) (final_builtin) (case_builtin)] @font-lock-keyword-face
+     [(super) (this)] @font-lock-keyword-face
+     ((identifier) @font-lock-keyword-face
+      (:match "^rethrow" @font-lock-keyword-face))
+     (for_statement "for" @font-lock-keyword-face)
+     (finally_clause "finally" @font-lock-keyword-face)
+     (part_of_directive (part_of_builtin) @font-lock-builtin-face)
+     (function_type "Function" @font-lock-builtin-face)
+     (throw_expression "throw" @font-lock-keyword-face)
+     (while_statement "while" @font-lock-keyword-face)
+     (yield_each_statement
+      "yield" @font-lock-keyword-face
+      "*" @font-lock-keyword-face))
+
+   :language 'dart
+   :feature 'definition
    '((class_definition
       name: (identifier) @font-lock-type-face)
      (class_definition
-      "final" @font-lock-builtin-face)
+      "final" @font-lock-keyword-face)
      ((identifier) @font-lock-type-face
       (:match "\\`_?[A-Z]" @font-lock-type-face))
      (object_pattern
@@ -280,27 +299,9 @@ definition names.")
      (function_signature
       name: (identifier) @font-lock-function-name-face)
      (getter_signature
-      name: (identifier) @font-lock-function-name-face)
+      name: (identifier) @font-lock-builtin-face)
      (setter_signature
       name: (identifier) @font-lock-function-name-face))
-
-   :language 'dart
-   :feature 'keyword
-   `([,@dart-ts-mode--keywords] @font-lock-keyword-face
-     [,@dart-ts-mode--builtins] @font-lock-builtin-face
-     [(break_statement) (continue_statement)] @font-lock-keyword-face
-     [(const_builtin) (final_builtin) (case_builtin)] @font-lock-builtin-face
-     [(super) (this)] @font-lock-function-call-face
-     ((identifier) @font-lock-keyword-face
-      (:match "^rethrow" @font-lock-keyword-face))
-     (for_statement "for" @font-lock-keyword-face)
-     (finally_clause "finally" @font-lock-keyword-face)
-     (part_of_directive "of" @font-lock-builtin-face)
-     (throw_expression "throw" @font-lock-keyword-face)
-     (while_statement "while" @font-lock-keyword-face)
-     (yield_each_statement
-      "yield" @font-lock-keyword-face
-      "*" @font-lock-keyword-face))
 
    :language 'dart
    :feature 'string
@@ -370,7 +371,8 @@ definition names.")
      (qualified
       (identifier) @font-lock-property-name-face)
      (unconditional_assignable_selector
-      (identifier) @font-lock-property-name-face))
+      (identifier) @font-lock-property-name-face)
+     )
 
    :language 'dart
    :feature 'delimiter
@@ -495,8 +497,8 @@ Return nil if there is no name or NODE."
     ;; Font-lock.
     (setq-local treesit-font-lock-settings dart-ts-mode--font-lock-settings)
     (setq-local treesit-font-lock-feature-list
-                '(( comment definition)
-                  ( keyword string type)
+                '(( comment keyword)
+                  ( definition string type)
                   ( assignment constant number literal
                     annotation escape-sequence property)
                   ( delimiter operator bracket error)))
