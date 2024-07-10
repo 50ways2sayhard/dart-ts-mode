@@ -299,7 +299,7 @@ definition names.")
      (function_signature
       name: (identifier) @font-lock-function-name-face)
      (getter_signature
-      name: (identifier) @font-lock-builtin-face)
+      name: (identifier) @font-lock-function-name-face)
      (setter_signature
       name: (identifier) @font-lock-function-name-face))
 
