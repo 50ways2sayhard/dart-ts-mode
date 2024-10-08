@@ -255,7 +255,7 @@ definition names.")
      (for_statement "for" @font-lock-keyword-face)
      (finally_clause "finally" @font-lock-keyword-face)
      (part_of_directive (part_of_builtin) @font-lock-builtin-face)
-     (function_type "Function" @font-lock-builtin-face)
+     (function_type "Function" @font-lock-keyword-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (yield_each_statement
@@ -316,8 +316,7 @@ definition names.")
    '((type_identifier) @font-lock-type-face
      [(inferred_type)
       (void_type)
-      (nullable_type)
-      (function_type)] @font-lock-type-face
+      (nullable_type)] @font-lock-type-face
      (enum_declaration
       name: (identifier) @font-lock-type-face)
      (scoped_identifier
@@ -343,7 +342,7 @@ definition names.")
    :feature 'number
    '([(hex_integer_literal)
       (decimal_integer_literal)
-      (decimal_floating_point_literal)] @font-lock-number-face)
+      (decimal_floating_point_literal)] @font-lock-constant-face)
 
    :language 'dart
    :feature 'literal
