@@ -194,7 +194,7 @@ PARENT is always optional_formal_parameters."
 (defvar dart-ts-mode--builtins
   '("abstract" "as" "base" "covariant" "deferred"
     "dynamic" "export" "extension" "external"
-    "factory" "Function" "get" "implements"
+    "factory" "get" "implements"
     "import" "interface" "late" "library"
     "mixin" "operator" "part" "required"
     "sealed" "set" "static" "typedef")
@@ -255,7 +255,7 @@ definition names.")
      (for_statement "for" @font-lock-keyword-face)
      (finally_clause "finally" @font-lock-keyword-face)
      (part_of_directive (part_of_builtin) @font-lock-builtin-face)
-     (function_type "Function" @font-lock-keyword-face)
+     (function_type "Function" @font-lock-type-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (yield_each_statement
@@ -301,7 +301,9 @@ definition names.")
      (getter_signature
       name: (identifier) @font-lock-function-name-face)
      (setter_signature
-      name: (identifier) @font-lock-function-name-face))
+      name: (identifier) @font-lock-function-name-face)
+     (formal_parameter
+      name: (identifier) @font-lock-variable-name-face))
 
    :language 'dart
    :feature 'string
@@ -320,7 +322,8 @@ definition names.")
      (enum_declaration
       name: (identifier) @font-lock-type-face)
      (scoped_identifier
-      scope: (identifier) @font-lock-type-face)
+      scope: (identifier) @font-lock-type-face
+      name: (identifier) @font-lock-type-face)
      (type_alias
       (type_identifier) @font-lock-type-face)
      ((scoped_identifier
