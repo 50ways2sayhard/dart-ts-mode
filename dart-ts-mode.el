@@ -203,7 +203,10 @@ PARENT is always optional_formal_parameters."
 (defvar dart-ts-mode--operators
   '("=>" ".." "??" "==" "?"
     ":" "&&" "%" "<" ">" "="
-    ">=" "<=" "||")
+    ">=" "<=" "||" ">>>="
+    ">>=" "<<=" "&=" "|=" "??="
+    "%=" "+=" "-=" "*=" "/="
+    "^=" "~/=")
   "Dart operators for tree-sitter font-locking.")
 
 (defvar dart-ts-mode--imenu-settings
@@ -384,12 +387,12 @@ definition names.")
    :feature 'operator
    `([,@dart-ts-mode--operators] @font-lock-operator-face
      [(multiplicative_operator)
+      (shift_operator)
       (increment_operator)
       (is_operator)
       (prefix_operator)
       (equality_operator)
-      (additive_operator)] @font-lock-operator-face
-     (ternary_expression ["?" ":"] @font-lock-operator-face))
+      (additive_operator)] @font-lock-operator-face)
 
    :language 'dart
    :feature 'bracket
