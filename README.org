@@ -70,9 +70,6 @@ Add following code to your init file:
 ;; For all-the-icons users:
 (add-to-list 'all-the-icons-mode-icon-alist
              '(dart-ts-mode all-the-icons-fileicon "dart" :height 1.0 :face all-the-icons-blue))
-
-;; For nerd-icons users:
-(add-to-list 'nerd-icons-mode-icon-alist '(dart-ts-mode nerd-icons-devicon "nf-dev-dart" :face nerd-icons-blue))
 #+end_src
 
 ** References
