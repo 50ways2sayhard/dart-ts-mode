@@ -54,14 +54,8 @@ Personally I use =eglot= as lsp client:
 #+end_src
 
 *** Code Formating
-I recommand [[https://github.com/radian-software/apheleia][apheleia]] , to work with it, add these lines to your init file:
-#+begin_src emacs-lisp
-(use-package apheleia
-  :commands (apheleia-format-buffer)
-  :init
-  (require 'apheleia-formatters)
-  (add-to-list 'apheleia-mode-alist '(dart-ts-mode . dart-format)))
-#+end_src
+I recommend [[https://github.com/radian-software/apheleia][apheleia]]. It already supports this package.
+
 Or you can format buffer with your lsp client.
 
 *** File Icon
