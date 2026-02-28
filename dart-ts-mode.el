@@ -359,14 +359,16 @@ definition names.")
    :feature 'constant
    '([(true) (false)] @font-lock-constant-face)
 
-   ;; 方法调用中的变量 - identifier 后跟属性 selector（优先匹配）
+   ;; 方法调用中的变量 - identifier 后跟属性 selector
+   ;; 排除大写开头的标识符（类名），让 type feature 处理
    :language 'dart
    :feature 'variable
    :override t
-   '((expression_statement
-      (identifier) @font-lock-variable-use-face
-      (selector [(unconditional_assignable_selector)
-                 (conditional_assignable_selector)])))
+   '(((expression_statement
+       (identifier) @font-lock-variable-use-face
+       (selector [(unconditional_assignable_selector)
+                  (conditional_assignable_selector)]))
+      (:match "\\`[a-z_]" @font-lock-variable-use-face)))
 
    ;; 直接函数调用 - identifier 后跟 argument_part
    :language 'dart
@@ -400,6 +402,7 @@ definition names.")
 
    :language 'dart
    :feature 'property
+   :override t
    `((cascade_selector
       (identifier) @font-lock-property-name-face)
      (conditional_assignable_selector
@@ -555,9 +558,9 @@ Return nil if there is no name or NODE."
     (setq-local treesit-font-lock-settings dart-ts-mode--font-lock-settings)
     (setq-local treesit-font-lock-feature-list
                 '(( comment keyword)
-                  ( definition string type function variable)
+                  ( definition string type function variable property)
                   ( assignment constant number literal
-                    annotation escape-sequence property)
+                    annotation escape-sequence)
                   ( delimiter operator bracket error)))
 
     (treesit-major-mode-setup)))
