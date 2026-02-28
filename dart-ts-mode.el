@@ -403,11 +403,11 @@ definition names.")
    `((cascade_selector
       (identifier) @font-lock-property-name-face)
      (conditional_assignable_selector
-      (identifier) @font-lock-property-name-face)
+      (identifier) @dart-ts-mode--fontify-property-or-method)
      (qualified
       (identifier) @font-lock-property-name-face)
      (unconditional_assignable_selector
-      (identifier) @font-lock-property-name-face)
+      (identifier) @dart-ts-mode--fontify-property-or-method)
      )
 
    :language 'dart
@@ -434,6 +434,27 @@ definition names.")
    :override t
    '((ERROR) @font-lock-warning-face))
   "Tree-sitter font-lock settings for `dart-ts-mode'.")
+
+
+(defun dart-ts-mode--fontify-property-or-method (node override start end &rest _)
+  "Fontify NODE as method call or property based on context.
+If NODE is followed by an argument_part selector, it's a method call.
+Otherwise it's a property access."
+  (let* ((assignable-selector (treesit-node-parent node))
+         (selector (treesit-node-parent assignable-selector))
+         (next-sibling (treesit-node-next-sibling selector))
+         (is-method-call
+          (and next-sibling
+               (let ((first-child (treesit-node-child next-sibling 0)))
+                 (and first-child
+                      (string= (treesit-node-type first-child) "argument_part"))))))
+    (treesit-fontify-with-override
+     (treesit-node-start node)
+     (treesit-node-end node)
+     (if is-method-call
+         'font-lock-function-call-face
+       'font-lock-property-name-face)
+     override)))
 
 (defun dart-ts-mode--defun-name (node)
   "Return the defun name of NODE.
