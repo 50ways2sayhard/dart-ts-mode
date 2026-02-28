@@ -357,10 +357,23 @@ definition names.")
 
    :language 'dart
    :feature 'constant
-   '([(true) (false)] @font-lock-constant-face
-     ;; TODO place in proper feature
-     (expression_statement
-      (identifier) @font-lock-function-call-face))
+   '([(true) (false)] @font-lock-constant-face)
+
+   ;; 方法调用中的变量 - identifier 后跟属性 selector（优先匹配）
+   :language 'dart
+   :feature 'variable
+   :override t
+   '((expression_statement
+      (identifier) @font-lock-variable-use-face
+      (selector [(unconditional_assignable_selector)
+                 (conditional_assignable_selector)])))
+
+   ;; 直接函数调用 - identifier 后跟 argument_part
+   :language 'dart
+   :feature 'function
+   '((expression_statement
+      (identifier) @font-lock-function-call-face
+      (selector (argument_part))))
 
    :language 'dart
    :feature 'number
@@ -521,7 +534,7 @@ Return nil if there is no name or NODE."
     (setq-local treesit-font-lock-settings dart-ts-mode--font-lock-settings)
     (setq-local treesit-font-lock-feature-list
                 '(( comment keyword)
-                  ( definition string type)
+                  ( definition string type function variable)
                   ( assignment constant number literal
                     annotation escape-sequence property)
                   ( delimiter operator bracket error)))
