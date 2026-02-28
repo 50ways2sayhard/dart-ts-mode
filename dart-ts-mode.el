@@ -274,7 +274,7 @@ definition names.")
      (for_statement "for" @font-lock-keyword-face)
      (finally_clause "finally" @font-lock-keyword-face)
      (part_of_directive (part_of_builtin) @font-lock-builtin-face)
-     (function_type "Function" @font-lock-type-face)
+     (function_type "Function" @font-lock-keyword-face)
      (throw_expression "throw" @font-lock-keyword-face)
      (while_statement "while" @font-lock-keyword-face)
      (yield_each_statement
@@ -311,10 +311,6 @@ definition names.")
       name: (identifier) @font-lock-variable-name-face)
      (static_final_declaration
       (identifier) @font-lock-variable-name-face)
-     (constant_constructor_signature
-      (identifier) @font-lock-type-face)
-     (constructor_signature
-      name: (identifier) @font-lock-type-face)
      (function_signature
       name: (identifier) @font-lock-function-name-face)
      (getter_signature
@@ -335,6 +331,9 @@ definition names.")
    :feature 'type
    :override t
    '((type_identifier) @font-lock-type-face
+     ((identifier) @font-lock-type-face
+      (:match "\\`_?[A-Z]" @font-lock-type-face))
+
      [(inferred_type)
       (void_type)
       (nullable_type)] @font-lock-type-face
