@@ -312,9 +312,9 @@ definition names.")
      (static_final_declaration
       (identifier) @font-lock-variable-name-face)
      (constant_constructor_signature
-      (identifier) @font-lock-function-name-face)
+      (identifier) @font-lock-type-face)
      (constructor_signature
-      name: (identifier) @font-lock-function-name-face)
+      name: (identifier) @font-lock-type-face)
      (function_signature
       name: (identifier) @font-lock-function-name-face)
      (getter_signature
@@ -358,7 +358,10 @@ definition names.")
 
    :language 'dart
    :feature 'constant
-   '([(true) (false)] @font-lock-constant-face)
+   '([(true) (false)] @font-lock-constant-face
+     ;; TODO place in proper feature
+     (expression_statement
+      (identifier) @font-lock-function-call-face))
 
    :language 'dart
    :feature 'number
