@@ -197,7 +197,7 @@ If there is no match, it returns the start position of ggp."
 (defun dart-ts-mode--optional-formal-parameters-indent-rule (_node parent &rest _)
   "Return indentation of children of optional_formal_parameters.
 PARENT is always optional_formal_parameters."
-  (if-let ((formal-sib (treesit-node-prev-sibling parent "formal_parameter")))
+  (if-let* ((formal-sib (treesit-node-prev-sibling parent "formal_parameter")))
       (treesit-node-start formal-sib)
     (+ (dart-ts-mode--node-bol parent) dart-ts-mode-indent-offset)))
 
@@ -211,7 +211,7 @@ PARENT is always optional_formal_parameters."
 
 (defvar dart-ts-mode--builtins
   '("abstract" "as" "base" "covariant" "deferred"
-    "dynamic" "export" "extension" "external"
+    "export" "extension" "external"
     "factory" "get" "implements"
     "import" "interface" "late" "library"
     "mixin" "operator" "part" "required"
@@ -268,11 +268,9 @@ definition names.")
    :override t
    `([,@dart-ts-mode--keywords] @font-lock-keyword-face
      [,@dart-ts-mode--builtins] @font-lock-builtin-face
-     [(break_statement) (continue_statement)] @font-lock-keyword-face
+     [(break_statement) (continue_statement) (rethrow_builtin)] @font-lock-keyword-face
      [(const_builtin) (final_builtin) (case_builtin)] @font-lock-keyword-face
      [(super) (this)] @font-lock-keyword-face
-     ((identifier) @font-lock-keyword-face
-      (:match "^rethrow" @font-lock-keyword-face))
      (for_statement "for" @font-lock-keyword-face)
      (finally_clause "finally" @font-lock-keyword-face)
      (part_of_directive (part_of_builtin) @font-lock-builtin-face)
