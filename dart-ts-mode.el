@@ -325,6 +325,8 @@ definition names.")
    :override t
    '((string_literal) @font-lock-string-face
      (template_substitution) @font-lock-variable-name-face
+     (template_substitution
+      "$" @font-lock-function-call-face)
      (dotted_identifier_list) @font-lock-string-face)
 
    :language 'dart
