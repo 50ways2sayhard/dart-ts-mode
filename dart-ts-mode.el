@@ -203,7 +203,7 @@ PARENT is always optional_formal_parameters."
 
 (defvar dart-ts-mode--keywords
   '("async" "async*" "await" "catch" "class"
-    "default" "else" "enum" "extends" "get" "hide"
+    "default" "else" "enum" "extends" "hide"
     "if" "in" "is" "new" "on" "return"
     "show" "super" "switch" "sync*" "this"
     "try" "when" "with" "yield")
@@ -212,10 +212,10 @@ PARENT is always optional_formal_parameters."
 (defvar dart-ts-mode--builtins
   '("abstract" "as" "base" "covariant" "deferred"
     "export" "extension" "external"
-    "factory" "get" "implements"
+    "factory" "implements"
     "import" "interface" "late" "library"
     "mixin" "operator" "part" "required"
-    "sealed" "set" "static" "typedef")
+    "sealed" "static" "typedef")
   "Dart builtins for tree-sitter font locking.")
 
 (defvar dart-ts-mode--operators
@@ -314,8 +314,10 @@ definition names.")
      (function_signature
       name: (identifier) @font-lock-function-name-face)
      (getter_signature
+      "get" @font-lock-keyword-face
       name: (identifier) @font-lock-function-name-face)
      (setter_signature
+      "set" @font-lock-keyword-face
       name: (identifier) @font-lock-function-name-face)
      (formal_parameter
       name: (identifier) @font-lock-variable-name-face))
