@@ -67,7 +67,6 @@
     (modify-syntax-entry ?\n "> b"  table)
     (modify-syntax-entry ?\^m "> b" table)
     (modify-syntax-entry ?$ "_" table)
-    (modify-syntax-entry ?` "\"" table)
     table)
   "Syntax table for `dart-ts-mode'.")
 
