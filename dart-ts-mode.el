@@ -1,6 +1,6 @@
 ;;; dart-ts-mode.el --- tree sitter support for Dart  -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2022-2023 Free Software Foundation, Inc.
+;; Copyright (C) 2022-2026 John Gong.
 
 ;; Author     : John Gong <gjtzone@hotmail.com>
 ;; Maintainer : John Gong <gjtzone@hotmail.com>
