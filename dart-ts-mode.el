@@ -271,6 +271,7 @@ definition names.")
      [(const_builtin) (final_builtin) (case_builtin)] @font-lock-keyword-face
      [(super) (this)] @font-lock-keyword-face
      (for_statement "for" @font-lock-keyword-face)
+     (for_element "for" @font-lock-keyword-face)
      (finally_clause "finally" @font-lock-keyword-face)
      (part_of_directive (part_of_builtin) @font-lock-builtin-face)
      (function_type "Function" @font-lock-keyword-face)
