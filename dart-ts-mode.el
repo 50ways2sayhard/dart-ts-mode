@@ -287,8 +287,6 @@ definition names.")
       name: (identifier) @font-lock-type-face)
      (class_definition
       "final" @font-lock-keyword-face)
-     ((identifier) @font-lock-type-face
-      (:match "\\`_?[A-Z]" @font-lock-type-face))
      (object_pattern
       ((identifier) @font-lock-variable-name-face))
      (constant_pattern
@@ -326,8 +324,7 @@ definition names.")
    '((string_literal) @font-lock-string-face
      (template_substitution) @font-lock-variable-name-face
      (template_substitution
-      "$" @font-lock-function-call-face)
-     (dotted_identifier_list) @font-lock-string-face)
+      "$" @font-lock-escape-face))
 
    :language 'dart
    :feature 'type
@@ -383,7 +380,7 @@ definition names.")
    :feature 'number
    '([(hex_integer_literal)
       (decimal_integer_literal)
-      (decimal_floating_point_literal)] @font-lock-constant-face)
+      (decimal_floating_point_literal)] @font-lock-number-face)
 
    :language 'dart
    :feature 'literal
